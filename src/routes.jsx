@@ -1,31 +1,31 @@
-import TableBerat from './pages/TableWeight'
-import TableDetail from './pages/TableDetail'
-import Tugas from './pages/Tugas'
+import TableBerat from "./pages/TableWeight";
+import TableDetail from "./pages/TableDetail";
+import Tugas from "./pages/Tugas";
 
-import RootLayout from './pages/layout/RootLayout'
-import SidebarLayout from './pages/layout/SidebarLayout'
+import RootLayout from "./pages/layout/RootLayout";
+import SidebarLayout from "./pages/layout/SidebarLayout";
 
 const routes = [
   {
     element: <RootLayout />,
     children: [
       {
-        path: '/',
+        path: "/",
         element: <SidebarLayout />,
         children: [
           { index: true, element: <TableDetail /> },
           {
-            path: '/tableBerat',
+            path: "/tableBerat",
             children: [{ index: true, element: <TableBerat /> }],
           },
           {
-            path: '/tugas',
+            path: "/tugas",
             children: [{ index: true, element: <Tugas /> }],
           },
         ],
       },
     ],
   },
-]
+];
 
-export default routes
+export default routes;
