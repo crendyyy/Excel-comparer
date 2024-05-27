@@ -54,6 +54,9 @@ const TableDetail = () => {
               setValue={setTypeColumn}
               px="4"
               py="3"
+              rounded='primary'
+              border='gray-200'
+              justify='between'
             />
           </div>
         </div>

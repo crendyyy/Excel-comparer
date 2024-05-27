@@ -32,12 +32,12 @@ const Dropdown = (props) => {
 
   return (
     <div
-      className={`relative w-full max-w-sm max-md:max-w-none`}
+      className={`relative w-full h-full max-w-sm max-md:max-w-none`}
       ref={dropdownRef}
     >
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between gap-1 rounded-primary border  border-gray-200 bg-gray-50 px-${
+        className={`flex h-full items-center justify-between gap-1 rounded-${props.rounded} border  border-${props.border} bg-gray-50 px-${
           props.px
         } py-${props.py} ${
           isOpen
@@ -52,7 +52,7 @@ const Dropdown = (props) => {
       </div>
 
       {isOpen && (
-        <ul className="absolute top-14 z-[70] w-full rounded-primary border border-slate-200 bg-white drop-shadow-sm">
+        <ul className={`absolute top-14 z-[70] w-full rounded-${props.rounded} border border-slate-200 bg-white drop-shadow-sm`}>
           {props.options?.map((option) => (
             <li
               key={option.id}
@@ -63,7 +63,8 @@ const Dropdown = (props) => {
                   option.selectOp
                 )
               }
-              className={`flex cursor-pointer justify-between px-4 py-3 ${
+              className={`flex cursor-pointer justify-${props.justify} px-${props.px} 
+              py-${props.py}  ${
                 option.id === props.value ? "text-primary" : ""
               }`}
             >

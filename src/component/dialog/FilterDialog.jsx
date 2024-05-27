@@ -21,11 +21,16 @@ const FilterDialog = ({ onClose }) => {
         <div className="flex flex-col gap-2">
           <span className="text-base font-bold">Filter Warna</span>
           <div className="flex h-8 gap-2">
-            <div className="w-8">
+            <div className="">
               <Dropdown
                 options={Operator}
                 value={typeOperator}
                 setValue={setTypeOperator}
+                px='2'
+                py='2'
+                rounded='lg'
+                border='primary'
+                justify='center'
               />
             </div>
             <input
@@ -38,7 +43,7 @@ const FilterDialog = ({ onClose }) => {
               type="color"
               id="favcolor"
               name="favcolor"
-              className="w-8 h-full border border-solid rounded-lg border-primary"
+              className="h-full border border-solid rounded-lg w-11 border-primary"
               value={color}
               onChange={handleColorPicker}
             />
