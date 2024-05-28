@@ -11,9 +11,9 @@ const Dropdown = (props) => {
     setIsOpen(false);
   };
 
-  const handleSelectOption = (id, columnType, selectOp) => {
-    setSelectedValue(columnType || selectOp);
-    props.setValue(columnType || id);
+  const handleSelectOption = (id, columnType, selectOp, operatorType) => {
+    setSelectedValue(columnType || selectOp || operatorType);
+    props.setValue(id);
     closeDropdown();
   };
 
@@ -37,9 +37,11 @@ const Dropdown = (props) => {
     >
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex h-full items-center justify-between gap-1 rounded-${props.rounded} border  border-${props.border} bg-gray-50 px-${
-          props.px
-        } py-${props.py} ${
+        className={`flex h-full items-center justify-between gap-1 rounded-${
+          props.rounded
+        } border  border-${props.border} bg-gray-50 px-${props.px} py-${
+          props.py
+        } ${
           isOpen
             ? "!border-primary !bg-primary-lighten shadow-input outline-none"
             : ""
@@ -52,7 +54,9 @@ const Dropdown = (props) => {
       </div>
 
       {isOpen && (
-        <ul className={`absolute top-14 z-[70] w-full rounded-${props.rounded} border border-slate-200 bg-white drop-shadow-sm`}>
+        <ul
+          className={`absolute top-14 z-[70] w-full rounded-${props.rounded} border border-slate-200 bg-white drop-shadow-sm`}
+        >
           {props.options?.map((option) => (
             <li
               key={option.id}
@@ -60,10 +64,13 @@ const Dropdown = (props) => {
                 handleSelectOption(
                   option.id,
                   option.columnType,
-                  option.selectOp
+                  option.selectOp,
+                  option.operatorType
                 )
               }
-              className={`flex cursor-pointer justify-${props.justify} px-${props.px} 
+              className={`flex cursor-pointer justify-${props.justify} px-${
+                props.px
+              } 
               py-${props.py}  ${
                 option.id === props.value ? "text-primary" : ""
               }`}
@@ -73,7 +80,7 @@ const Dropdown = (props) => {
                   option.columnType === "Done" ? "text-[#16A34A]" : ""
                 }${option.columnType === "Pending" ? "text-yellow-600" : ""}`}
               >
-                {option.columnType || option.selectOp}
+                {option.columnType || option.selectOp || option.operatorType}
               </p>
             </li>
           ))}

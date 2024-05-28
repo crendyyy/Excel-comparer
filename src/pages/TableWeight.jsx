@@ -1,16 +1,20 @@
 import { useState } from "react";
 import Dropdown from "../component/shared/Dropdown";
 import FilterIcon from "../component/icons/FilterIcon";
+import useDialog from "../hooks/useDialog";
+import FilterDialog from "../component/dialog/FilterDialog";
 
 const TableWeight = () => {
+  const { isDialogOpen, openDialog, closeDialog } = useDialog();
+
   return (
-    <div className="flex flex-col p-10 gap-8">
+    <div className="flex flex-col gap-8 p-10">
       <h1 className="font-bold">Table Berat</h1>
-      <div className="flex justify-between p-6 rounded-primary bg-white w-full">
+      <div className="flex justify-between w-full p-6 bg-white rounded-primary">
         <div className="flex gap-6">
           <label
-            for="main-file"
-            className="py-3 px-4 flex gap-2 border-2 border-dashed rounded-primary border-gray-100 font-semibold text-base text-gray-600"
+            htmlFor="main-file"
+            className="flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-primary"
           >
             File Utama
           </label>
@@ -22,8 +26,8 @@ const TableWeight = () => {
             required
           />
           <label
-            for="compares-file"
-            className="py-3 px-4 flex gap-2 border-2 border-dashed rounded-primary border-gray-100 font-semibold text-base text-gray-600"
+            htmlFor="compares-file"
+            className="flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-primary"
           >
             File Turunan
           </label>
@@ -37,7 +41,10 @@ const TableWeight = () => {
           />
         </div>
         <div className="flex gap-4">
-          <button className="h-full px-4 rounded-primary bg-[#110F45] flex items-center">
+          <button
+            onClick={openDialog}
+            className="h-full px-4 rounded-primary bg-[#110F45] flex items-center"
+          >
             <FilterIcon />
           </button>
           <button className="h-full px-4 rounded-primary bg-[#110F45] flex items-center text-base font-bold text-white">
@@ -45,6 +52,7 @@ const TableWeight = () => {
           </button>
         </div>
       </div>
+      {isDialogOpen && <FilterDialog onClose={closeDialog} />}
     </div>
   );
 };
