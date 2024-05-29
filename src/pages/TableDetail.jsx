@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dropdown from "../component/shared/Dropdown";
 import FilterIcon from "../component/icons/FilterIcon";
@@ -8,6 +8,7 @@ import TableResult from "../component/Table/TableResults";
 import { FormContext } from "../context/FormContext"; // Sesuaikan path dengan struktur proyek Anda
 
 const TableDetail = () => {
+  const [filters, setFilters] = useState([]);
   const {
     formData,
     setFormData,
@@ -32,6 +33,7 @@ const TableDetail = () => {
   const { isDialogOpen, openDialog, closeDialog } = useDialog();
   const mainFileRef = useRef(null);
   const secondaryFilesRef = useRef(null);
+  const navigate = useNavigate();
 
   const columns = [
     { id: 0, columnType: "Pilih Kolum" },
@@ -151,6 +153,28 @@ const TableDetail = () => {
     });
   };
 
+  const handleFilterDialogClose = () => {
+    closeDialog();
+  };
+
+  const handleApplyFilters = (filters) => {
+    setFilters(filters);
+  };
+
+  const handleDetailClick = (result) => {
+    navigate(`/table/${encodeURIComponent(result.filename)}`, {
+      state: {
+        result,
+        previousState: {
+          typeTable,
+          typeColumn,
+          typeOperator,
+          filters,
+        },
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col gap-8 p-10">
       <h1 className="font-bold">Table Detail</h1>
@@ -233,8 +257,13 @@ const TableDetail = () => {
           </button>
         </div>
       </form>
-      {isSubmited && <TableResult results={filteredResults} />}
-      {isDialogOpen && <FilterDialog onClose={closeDialog} />}
+      <TableResult results={filteredResults} previousState={{ typeTable, typeColumn, typeOperator, filters }} />
+      {isDialogOpen && (
+        <FilterDialog
+          onClose={handleFilterDialogClose}
+          onApplyFilters={handleApplyFilters}
+        />
+      )}
     </div>
   );
 };
