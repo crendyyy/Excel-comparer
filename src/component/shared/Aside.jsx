@@ -6,8 +6,7 @@ const Sidebar = () => {
       <h1 className="font-semibold">Excel Comparer</h1>
 
       <div className="flex flex-col gap-6">
-        <Menu text="Table Detail" link="/" />
-        <Menu text="Table Berat" link="/tableBerat" />
+        <Menu text="Compare" link="/" />
         <Menu text="Tugas" link="/tugas" />
       </div>
     </aside>

@@ -1,4 +1,3 @@
-import TableBerat from "./pages/TableWeight";
 import TableDetail from "./pages/TableDetail";
 import Tugas from "./pages/Tugas";
 
@@ -15,10 +14,6 @@ const routes = [
         element: <SidebarLayout />,
         children: [
           { index: true, element: <TableDetail /> },
-          {
-            path: "/tableBerat",
-            children: [{ index: true, element: <TableBerat /> }],
-          },
           {
             path: "/tugas",
             children: [{ index: true, element: <Tugas /> }],
