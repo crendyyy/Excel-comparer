@@ -11,10 +11,12 @@ export const FormProvider = ({ children }) => {
   });
   const [typeColumn, setTypeColumn] = useState("Pilih Kolum");
   const [typeOperator, setTypeOperator] = useState("Pilih Operator");
-  const [typeTable, setTypeTable] = useState("Pilih E-comm");
+  const [typeTable, setTypeTable] = useState("shopee_product");
   const [mainFileName, setMainFileName] = useState("File Utama");
   const [secondaryFileNames, setSecondaryFileNames] = useState("File Turunan");
   const [filteredResults, setFilteredResults] = useState([]);
+  const [filterCriteria, setFilterCriteria] = useState([]);
+  const [savedFilters, setSavedFilters] = useState([]);
   const [isSubmited, setIsSubmited] = useState(false);
   const [hideOperator, setHideOperator] = useState(false);
 
@@ -39,6 +41,10 @@ export const FormProvider = ({ children }) => {
         setIsSubmited,
         hideOperator,
         setHideOperator,
+        filterCriteria,
+        setFilterCriteria,
+        savedFilters,
+        setSavedFilters,
       }}
     >
       {children}

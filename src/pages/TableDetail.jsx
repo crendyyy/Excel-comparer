@@ -8,7 +8,6 @@ import TableResult from "../component/Table/TableResults";
 import { FormContext } from "../context/FormContext"; // Sesuaikan path dengan struktur proyek Anda
 
 const TableDetail = () => {
-  const [filters, setFilters] = useState([]);
   const {
     formData,
     setFormData,
@@ -19,6 +18,7 @@ const TableDetail = () => {
     typeTable,
     setTypeTable,
     mainFileName,
+    filterCriteria,
     setMainFileName,
     secondaryFileNames,
     setSecondaryFileNames,
@@ -28,18 +28,18 @@ const TableDetail = () => {
     setIsSubmited,
     hideOperator,
     setHideOperator,
+    setFilterCriteria,
   } = useContext(FormContext);
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog();
   const mainFileRef = useRef(null);
   const secondaryFilesRef = useRef(null);
   const navigate = useNavigate();
-
   const columns = [
     { id: 0, columnType: "Pilih Kolum" },
     { id: "sku_produk", columnType: "SKU" },
-    { id: "harga_produk", columnType: "Harga" },
-    { id: "stok_produk", columnType: "Stok" },
+    { id: "harga", columnType: "Harga" },
+    { id: "stok", columnType: "Stok" },
   ];
 
   const types = [
@@ -58,7 +58,7 @@ const TableDetail = () => {
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, targetColumn: typeColumn }));
-    setHideOperator(!["harga_produk", "stok_produk"].includes(typeColumn));
+    setHideOperator(!["harga", "stok"].includes(typeColumn));
     if (hideOperator) setTypeOperator("Pilih Operator");
   }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator]);
 
@@ -140,38 +140,16 @@ const TableDetail = () => {
       const filteredRows = fileResult.rows.filter((row) => {
         switch (operator) {
           case "less_than":
-            return row.difference < 0;
+            return row.selisih < 0;
           case "greater_than":
-            return row.difference > 0;
+            return row.selisih > 0;
           case "not_equal":
-            return row.difference !== 0;
+            return row.selisih !== 0;
           default:
             return true;
         }
       });
       return { ...fileResult, rows: filteredRows };
-    });
-  };
-
-  const handleFilterDialogClose = () => {
-    closeDialog();
-  };
-
-  const handleApplyFilters = (filters) => {
-    setFilters(filters);
-  };
-
-  const handleDetailClick = (result) => {
-    navigate(`/table/${encodeURIComponent(result.filename)}`, {
-      state: {
-        result,
-        previousState: {
-          typeTable,
-          typeColumn,
-          typeOperator,
-          filters,
-        },
-      },
     });
   };
 
@@ -257,11 +235,18 @@ const TableDetail = () => {
           </button>
         </div>
       </form>
-      <TableResult results={filteredResults} previousState={{ typeTable, typeColumn, typeOperator, filters }} />
+      <TableResult
+        results={filteredResults}
+        previousState={{ typeTable, typeColumn, typeOperator, filterCriteria }}
+      />
       {isDialogOpen && (
         <FilterDialog
-          onClose={handleFilterDialogClose}
-          onApplyFilters={handleApplyFilters}
+          onClose={closeDialog}
+          onSubmit={(filters) => {
+            setFilterCriteria(filters);
+            closeDialog();
+            console.log("Filter Criteria:", filters);
+          }}
         />
       )}
     </div>

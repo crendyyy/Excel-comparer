@@ -1,36 +1,36 @@
-import React from 'react';
-import { Table } from 'antd';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Table } from "antd";
+import { Link } from "react-router-dom";
 
 const TableResult = ({ results, previousState }) => {
   const columns = [
     {
-      title: 'No',
-      dataIndex: 'no',
+      title: "No",
+      dataIndex: "no",
       width: 12,
       render: (text, record, index) => (
         <span className="text-sm font-normal">{index + 1}</span>
       ),
     },
     {
-      title: 'Nama File',
-      dataIndex: 'name',
+      title: "Nama File",
+      dataIndex: "name",
       render: (text, record) => (
         <span className="text-sm font-normal">{record.filename}</span>
       ),
     },
     {
-      title: 'Perbedaan',
-      dataIndex: 'different',
+      title: "Perbedaan",
+      dataIndex: "different",
       render: (text, record) => (
         <span className="text-sm font-normal">{record.rows.length}</span>
       ),
     },
     {
-      dataIndex: '',
-      key: 'x',
+      dataIndex: "",
+      key: "x",
       render: (text, record) => (
-        <div className='flex justify-end w-full'>
+        <div className="flex justify-end w-full">
           <Link
             to={`/table/${encodeURIComponent(record.filename)}`}
             state={{ result: record, previousState }}

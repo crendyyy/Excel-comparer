@@ -1,80 +1,145 @@
-// FilterDialog.jsx
-import React, { useState } from 'react';
 import Dialog from "../shared/Dialog";
+import React, { useState, useContext } from "react";
 import Dropdown from "../shared/Dropdown";
-import TrashIcon from "../icons/TrashIcon";
+import { FormContext } from "../../context/FormContext";
+import TrashIcon from "../icons/TrashIcon"; // pastikan Anda memiliki ikon ini
 
-const FilterDialog = ({ onClose, onApplyFilters }) => {
+const FilterDialog = ({ onClose, onSubmit }) => {
   const [filters, setFilters] = useState([]);
+  const [color, setColor] = useState("#ffffff");
+  const [typeOperator, setTypeOperator] = useState(">");
+  const [value, setValue] = useState("");
+  const { savedFilters, setSavedFilters } = useContext(FormContext);
 
   const Operator = [
-    { id: 0, selectOp: "=" },
-    { id: 1, selectOp: ">" },
-    { id: 2, selectOp: "<" },
+    { id: "=", selectOp: "=" },
+    { id: ">", selectOp: ">" },
+    { id: "<", selectOp: "<" },
   ];
 
+  const handleColorPicker = (e) => {
+    setColor(e.target.value);
+  };
+
   const handleAddFilter = () => {
-    setFilters([...filters, { operator: "=", threshold: 5, color: "#ffffff" }]);
+    if (value !== "") {
+      const newFilter = {
+        operator: typeOperator,
+        value: parseFloat(value),
+        color,
+      };
+      setFilters([...filters, newFilter]);
+      setValue("");
+      setColor("#ffffff");
+      setTypeOperator(">");
+    }
   };
 
-  const handleFilterChange = (index, key, value) => {
-    const newFilters = [...filters];
-    newFilters[index][key] = value;
-    setFilters(newFilters);
-  };
-
-  const handleRemoveFilter = (index) => {
-    setFilters(filters.filter((_, i) => i !== index));
-  };
-
-  const handleApplyFilters = () => {
-    onApplyFilters(filters);
+  const handleConfirm = () => {
+    const combinedFilters = [...savedFilters, ...filters];
+    setSavedFilters(combinedFilters);
+    onSubmit(combinedFilters);
     onClose();
+  };
+
+  const handleDeleteFilter = (index) => {
+    const updatedFilters = savedFilters.filter((_, i) => i !== index);
+    setSavedFilters(updatedFilters);
   };
 
   return (
     <Dialog onCancel={onClose}>
       <div className="flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary">
-      <span className="text-base font-bold">Filter Warna</span>
-        {filters.map((filter, index) => (
-          <div key={index} className="flex h-8 gap-2">
-            <div>
+        <div className="flex flex-col gap-2">
+          <span className="text-base font-bold">Filter Warna</span>
+          <div className="flex h-8 gap-2">
+            <div className="w-fit">
               <Dropdown
                 options={Operator}
-                value={filter.operator}
-                setValue={(value) => handleFilterChange(index, "operator", value)}
-                px='2'
-                py='2'
-                rounded='lg'
-                border='primary'
-                justify='center'
+                value={typeOperator}
+                setValue={setTypeOperator}
+                px="2"
+                py="2"
+                rounded="lg"
+                border="primary"
+                justify="center"
               />
             </div>
             <input
               type="text"
               className="flex items-center w-full h-full px-4 border border-solid rounded-lg border-primary placeholder:text-base placeholder:font-medium placeholder:text-gray-400"
-              value={filter.threshold}
-              onChange={(e) => handleFilterChange(index, "threshold", e.target.value)}
-              placeholder="Pilih angka nya saja"
+              placeholder={`Pilih angka nya saja "5" %`}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
             />
+            <label htmlFor="favcolor" className="hidden"></label>
             <input
               type="color"
+              id="favcolor"
+              name="favcolor"
+              className="h-full border border-solid rounded-lg w-11 border-primary"
+              value={color}
+              onChange={handleColorPicker}
+            />
+          </div>
+          <button
+            className="flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-primary text-primary"
+            onClick={handleAddFilter}
+          >
+            Tambah
+          </button>
+        </div>
+        {/* Render saved filters */}
+        {savedFilters.map((filter, index) => (
+          <div className="flex h-8 gap-2" key={index}>
+            <div className="w-fit">
+              <Dropdown
+                options={Operator}
+                value={filter.operator}
+                setValue={(newValue) => {
+                  const updatedFilters = [...savedFilters];
+                  updatedFilters[index].operator = newValue;
+                  setSavedFilters(updatedFilters);
+                }}
+                px="2"
+                py="2"
+                rounded="lg"
+                border="primary"
+                justify="center"
+              />
+            </div>
+            <input
+              type="text"
+              className="flex items-center w-full h-full px-4 border border-solid rounded-lg border-primary placeholder:text-base placeholder:font-medium placeholder:text-gray-400"
+              placeholder={`Pilih angka nya saja "5" %`}
+              value={filter.value}
+              onChange={(e) => {
+                const updatedFilters = [...savedFilters];
+                updatedFilters[index].value = e.target.value;
+                setSavedFilters(updatedFilters);
+              }}
+            />
+            <label htmlFor="favcolor" className="hidden"></label>
+            <input
+              type="color"
+              id="favcolor"
+              name="favcolor"
               className="h-full border border-solid rounded-lg w-11 border-primary"
               value={filter.color}
-              onChange={(e) => handleFilterChange(index, "color", e.target.value)}
+              onChange={(e) => {
+                const updatedFilters = [...savedFilters];
+                updatedFilters[index].color = e.target.value;
+                setSavedFilters(updatedFilters);
+              }}
             />
             <button
-              type="button"
               className="flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg"
-              onClick={() => handleRemoveFilter(index)}
+              onClick={() => handleDeleteFilter(index)}
             >
-              <TrashIcon />
+              <TrashIcon className="w-5 h-5 text-red-500" />
             </button>
           </div>
         ))}
-        <button onClick={handleAddFilter} className="flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-primary text-primary">
-          Tambah
-        </button>
         <div className="flex h-12 gap-6">
           <button
             onClick={onClose}
@@ -83,7 +148,7 @@ const FilterDialog = ({ onClose, onApplyFilters }) => {
             Batalkan
           </button>
           <button
-            onClick={handleApplyFilters}
+            onClick={handleConfirm}
             className="flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-primary"
           >
             Konfirmasi
