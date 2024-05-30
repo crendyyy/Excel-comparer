@@ -40,13 +40,14 @@ const TableDetail = () => {
     { id: "sku_produk", columnType: "SKU" },
     { id: "harga", columnType: "Harga" },
     { id: "stok", columnType: "Stok" },
+    { id: "beratProduk", columnType: "Berat" },
   ];
 
   const types = [
     { id: 0, tableType: "Pilih E-comm" },
-    { id: 1, tableType: "shopee_product" },
-    { id: 2, tableType: "tiktok_product" },
-    { id: 3, tableType: "tokopedia_product" },
+    { id: 'shopee_product', tableType: "shopee" },
+    { id: 'tiktok_product', tableType: "tiktok" },
+    { id: 'tokopedia_product', tableType: "tokopedia" },
   ];
 
   const operators = [
@@ -57,8 +58,12 @@ const TableDetail = () => {
   ];
 
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, targetColumn: typeColumn }));
-    setHideOperator(!["harga", "stok"].includes(typeColumn));
+    setFormData((prev) => ({ 
+      ...prev, 
+      targetColumn: typeColumn,
+      type: typeColumn === "beratProduk" ? "shopee_weight" : formData.type, 
+    }));
+    setHideOperator(!["harga", "stok", "beratProduk"].includes(typeColumn));
     if (hideOperator) setTypeOperator("Pilih Operator");
   }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator]);
 
