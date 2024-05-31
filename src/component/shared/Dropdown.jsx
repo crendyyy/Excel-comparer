@@ -75,11 +75,7 @@ const Dropdown = (props) => {
                 option.id === props.value ? "text-primary" : ""
               }`}
             >
-              <p
-                className={`rounded-md px-2 py-1 ${
-                  option.columnType === "Done" ? "text-[#16A34A]" : ""
-                }${option.columnType === "Pending" ? "text-yellow-600" : ""}`}
-              >
+              <p>
                 {option.columnType || option.selectOp || option.operatorType}
               </p>
             </li>

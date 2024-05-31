@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
 import routes from './routes'
 import './index.css'
+import { FormProvider } from './context/FormContext'
 
 const router = createBrowserRouter(routes)
 
@@ -16,8 +17,10 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+      <FormProvider>
       <RouterProvider router={router} />
       <ReactQueryDevtools initialIsOpen={false} />
+      </FormProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 )

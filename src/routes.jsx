@@ -1,5 +1,4 @@
-import TableBerat from './pages/TableWeight'
-import TableDetail from './pages/TableDetail'
+import TableDetail from "./pages/TableDetail";
 import TaskListPage from './pages/TaskListPage'
 import TaskDetailPage from './pages/TaskDetailPage'
 
@@ -30,10 +29,6 @@ const routes = [
     ),
     children: [
       { index: true, element: <TableDetail /> },
-      {
-        path: '/tableBerat',
-        children: [{ index: true, element: <TableBerat /> }],
-      },
       {
         path: '/table/:filename',
         children: [{ index: true, element: <TableResultsDetail /> }],
