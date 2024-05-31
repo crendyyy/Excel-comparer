@@ -1,16 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import routes from "./routes";
-import "./index.css";
-import { FormProvider } from "./context/FormContext";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
-const router = createBrowserRouter(routes);
+import routes from './routes'
+import './index.css'
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const router = createBrowserRouter(routes)
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+})
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <FormProvider>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </FormProvider>
-  </React.StrictMode>
-);
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  </React.StrictMode>,
+)

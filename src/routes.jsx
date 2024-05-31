@@ -1,38 +1,52 @@
-import TableBerat from "./pages/TableWeight";
-import TableDetail from "./pages/TableDetail";
-import Tugas from "./pages/Tugas";
+import TableBerat from './pages/TableWeight'
+import TableDetail from './pages/TableDetail'
+import TaskListPage from './pages/TaskListPage'
+import TaskDetailPage from './pages/TaskDetailPage'
 
-import RootLayout from "./pages/layout/RootLayout";
-import SidebarLayout from "./pages/layout/SidebarLayout";
-import TableResultsDetail from "./component/Table/TableResultsDetail";
+import TableResultsDetail from './component/Table/TableResultsDetail'
+import { Layout } from 'antd'
+import { Content } from 'antd/es/layout/layout'
+import { Outlet } from 'react-router-dom'
+import Sider from 'antd/es/layout/Sider'
+import Aside from './component/shared/Aside'
 
 const routes = [
   {
-    element: <RootLayout />,
+    path: '/',
+    element: (
+      <Layout style={{ minHeight: '100vh' }}>
+        <Layout>
+          <Sider width={240}>
+            <Aside />
+          </Sider>
+
+          <Content>
+            <main className='w-full'>
+              <Outlet />
+            </main>
+          </Content>
+        </Layout>
+      </Layout>
+    ),
     children: [
+      { index: true, element: <TableDetail /> },
       {
-        path: "/",
-        element: <SidebarLayout />,
+        path: '/tableBerat',
+        children: [{ index: true, element: <TableBerat /> }],
+      },
+      {
+        path: '/table/:filename',
+        children: [{ index: true, element: <TableResultsDetail /> }],
+      },
+      {
+        path: '/tugas',
         children: [
-          { index: true, element: <TableDetail /> },
-          {
-            path: "/tableBerat",
-            children: [{ index: true, element: <TableBerat /> }],
-          },
-          {
-            path: "/tugas",
-            children: [{ index: true, element: <Tugas /> }],
-          },
-          {
-            path: '/table/:filename',
-            children: [
-              { index: true, element: <TableResultsDetail /> },
-            ],
-          },
+          { index: true, element: <TaskListPage /> },
+          { path: ':taskId', element: <TaskDetailPage /> },
         ],
       },
     ],
   },
-];
+]
 
-export default routes;
+export default routes
