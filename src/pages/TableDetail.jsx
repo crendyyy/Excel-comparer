@@ -5,6 +5,7 @@ import FilterIcon from "../component/icons/FilterIcon";
 import useDialog from "../hooks/useDialog";
 import FilterDialog from "../component/dialog/FilterDialog";
 import TableResult from "../component/Table/TableResults";
+import { Select, Space } from "antd";
 import { FormContext } from "../context/FormContext"; // Sesuaikan path dengan struktur proyek Anda
 
 const TableDetail = () => {
@@ -40,14 +41,14 @@ const TableDetail = () => {
     { id: "sku_produk", columnType: "SKU" },
     { id: "harga", columnType: "Harga" },
     { id: "stok", columnType: "Stok" },
-    { id: "beratProduk", columnType: "Berat" },
+    { id: "berat", columnType: "Berat" },
   ];
 
   const types = [
     { id: 0, tableType: "Pilih E-comm" },
-    { id: 'shopee_product', tableType: "shopee" },
-    { id: 'tiktok_product', tableType: "tiktok" },
-    { id: 'tokopedia_product', tableType: "tokopedia" },
+    { id: "shopee_product", tableType: "shopee" },
+    { id: "tiktok_product", tableType: "tiktok" },
+    { id: "tokopedia_product", tableType: "tokopedia" },
   ];
 
   const operators = [
@@ -58,12 +59,13 @@ const TableDetail = () => {
   ];
 
   useEffect(() => {
-    setFormData((prev) => ({ 
-      ...prev, 
+    setFormData((prev) => ({
+      ...prev,
       targetColumn: typeColumn,
-      type: typeColumn === "beratProduk" ? "shopee_weight" : formData.type, 
+      type: typeColumn === "berat" ? "shopee_weight" : "shopee_product",
     }));
-    setHideOperator(!["harga", "stok", "beratProduk"].includes(typeColumn));
+    setTypeTable(typeColumn === "berat" ? "shopee_weight" : "shopee_product");
+    setHideOperator(!["harga", "stok", "berat"].includes(typeColumn));
     if (hideOperator) setTypeOperator("Pilih Operator");
   }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator]);
 
@@ -156,6 +158,10 @@ const TableDetail = () => {
       });
       return { ...fileResult, rows: filteredRows };
     });
+  };
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
   };
 
   return (

@@ -30,20 +30,20 @@ const TableResultsDetail = () => {
         filter.operator === "greater_than" &&
         record.persentase > filter.value
       ) {
-        return filter.color;
+        return { color: filter.color, filter };
       } else if (
         filter.operator === "lesser_than" &&
         record.persentase < filter.value
       ) {
-        return filter.color;
+        return { color: filter.color, filter };
       } else if (
         filter.operator === "equal" &&
         record.persentase === filter.value
       ) {
-        return filter.color;
+        return { color: filter.color, filter };
       }
     }
-    return "transparent";
+    return { color: "transparent", filter: null };
   };
   console.log(savedFilters);
 
@@ -84,24 +84,135 @@ const TableResultsDetail = () => {
       key: "stok_produk",
     },
     {
+      title: "Persentase",
+      dataIndex: "persentase",
+      key: "persentase",
+      render: (text, record) => {
+        const { color } = applyFilters(record);
+        const formattedPercent = text ? parseFloat(text).toString() : "-";
+        return (
+          <span
+            style={{
+              backgroundColor: color,
+              padding: "0.5em",
+              borderRadius: "0.25em",
+            }}
+          >
+            {formattedPercent.includes(".")
+              ? parseFloat(formattedPercent).toFixed(1)
+              : formattedPercent}
+            %
+          </span>
+        );
+      },
+    },
+    {
       title: "Selisih",
       dataIndex: "selisih",
       key: "selisih",
       defaultSortOrder: "descend",
       sorter: (a, b) => a.selisih - b.selisih,
-      render: (text, record) => (
-        <span
-          style={{
-            backgroundColor: applyFilters(record),
-            padding: "0.5em",
-            borderRadius: "0.25em",
-          }}
-        >
-          {text ? text : "-"}
-        </span>
-      ),
+      render: (text, record) => {
+        const { color } = applyFilters(record);
+        return (
+          <span
+            style={{
+              backgroundColor: color,
+              padding: "0.5em",
+              borderRadius: "0.25em",
+            }}
+          >
+            {text ? text : "-"}
+          </span>
+        );
+      },
     },
   ];
+
+  const columnsWeight = [
+    {
+      title: "Kode Produk",
+      dataIndex: "kode_produk",
+      key: "kode_produk",
+    },
+    {
+      title: "SKU Induk",
+      dataIndex: "sku_induk",
+      key: "sku_induk",
+    },
+    {
+      title: "Nama Produk",
+      dataIndex: "nama_produk",
+      key: "nama_produk",
+    },
+    {
+      title: "Berat",
+      dataIndex: "berat",
+      key: "berat",
+    },
+    {
+      title: "Panjang",
+      dataIndex: "panjang",
+      key: "panjang",
+    },
+    {
+      title: "Lebar",
+      dataIndex: "lebar",
+      key: "lebar",
+    },
+    {
+      title: "Tinggi",
+      dataIndex: "tinggi",
+      key: "tinggi",
+    },
+    {
+      title: "Selisih",
+      dataIndex: "selisih",
+      key: "selisih",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.selisih - b.selisih,
+      render: (text, record) => {
+        const { color } = applyFilters(record);
+        return (
+          <span
+            style={{
+              backgroundColor: color,
+              padding: "0.5em",
+              borderRadius: "0.25em",
+            }}
+          >
+            {text ? text : "-"}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Persentase",
+      dataIndex: "persentase",
+      key: "persentase",
+      render: (text, record) => {
+        const { color } = applyFilters(record);
+        const formattedPercent = text ? parseFloat(text).toString() : "-";
+        return (
+          <span
+            style={{
+              backgroundColor: color,
+              padding: "0.5em",
+              borderRadius: "0.25em",
+            }}
+          >
+            {formattedPercent.includes(".")
+              ? parseFloat(formattedPercent).toFixed(1)
+              : formattedPercent}
+            %
+          </span>
+        );
+      },
+    },
+  ];
+
+  let setColumns =
+    previousState.typeTable === "shopee_product" ? columns : columnsWeight;
 
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
@@ -118,13 +229,18 @@ const TableResultsDetail = () => {
       name: filename,
       type: previousState.typeTable,
       targetColumn: previousState.typeColumn,
-      config: [
-        {
-          type: savedFilters.operator,
-          color: savedFilters.color,
-          value: savedFilters.value,
-        },
-      ],
+      config: selectedRows
+        .map((row) => {
+          const { filter } = applyFilters(row);
+          return filter
+            ? {
+                type: filter.operator,
+                color: filter.color,
+                value: filter.value,
+              }
+            : null;
+        })
+        .filter(Boolean),
       rows: selectedRows.map((row) => ({
         kode_produk: row.kode_produk,
         nama_produk: row.nama_produk,
@@ -150,6 +266,52 @@ const TableResultsDetail = () => {
     }
   };
 
+  const handleSaveTaskWeight = async () => {
+    const taskData = {
+      name: filename,
+      type: previousState.typeTable,
+      targetColumn: previousState.typeColumn,
+      config: selectedRows
+        .map((row) => {
+          const { filter } = applyFilters(row);
+          return filter
+            ? {
+                type: filter.operator,
+                color: filter.color,
+                value: filter.value,
+              }
+            : null;
+        })
+        .filter(Boolean),
+      rows: selectedRows.map((row) => ({
+        kode_produk: row.kode_produk,
+        nama_produk: row.nama_produk,
+        sku_induk: row.sku_induk,
+        berat: row.berat,
+        panjang: row.panjang,
+        lebar: row.lebar,
+        tinggi: row.tinggi,
+        selisih: row.selisih,
+        persentase: row.persentase,
+      })),
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/tasks",
+        taskData
+      );
+      console.log("Task saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving task:", error);
+    }
+  };
+  console.log(previousState.typeTable);
+  let saveTask =
+    previousState.typeTable === "shopee_product"
+      ? handleSaveTask
+      : handleSaveTaskWeight;
+
   return (
     <div className="flex flex-col gap-8 p-10">
       <div className="flex gap-6">
@@ -169,14 +331,14 @@ const TableResultsDetail = () => {
           type: "checkbox",
           ...rowSelection,
         }}
-        columns={columns}
+        columns={setColumns}
         dataSource={data}
         pagination={false}
       />
       <div className="flex justify-end w-full">
         <Button
           className="h-12 px-4 font-bold text-white w-fit text-smSS rounded-primary bg-primary"
-          onClick={handleSaveTask}
+          onClick={saveTask}
         >
           Simpan Tugas
         </Button>

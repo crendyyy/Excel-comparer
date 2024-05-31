@@ -6,7 +6,7 @@ export const FormProvider = ({ children }) => {
   const [formData, setFormData] = useState({
     mainFile: null,
     secondaryFiles: [],
-    type: "shopee_product",
+    type: "",
     targetColumn: "Pilih Kolum",
   });
   const [typeColumn, setTypeColumn] = useState("Pilih Kolum");
