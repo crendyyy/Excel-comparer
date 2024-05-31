@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <aside className="fixed inset-0 z-50 w-60 bg-white py-10 px-6 flex flex-col gap-10">
+    <aside className="fixed inset-0 z-50 flex flex-col gap-10 px-6 py-10 bg-white w-60">
       <h1 className="font-semibold">Excel Comparer</h1>
 
       <div className="flex flex-col gap-6">

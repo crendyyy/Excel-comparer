@@ -6,7 +6,7 @@ import useDialog from "../hooks/useDialog";
 import FilterDialog from "../component/dialog/FilterDialog";
 import TableResult from "../component/Table/TableResults";
 import { Select, Space } from "antd";
-import { FormContext } from "../context/FormContext"; // Sesuaikan path dengan struktur proyek Anda
+import { FormContext } from "../context/FormContext";
 
 const TableDetail = () => {
   const {
@@ -215,6 +215,7 @@ const TableDetail = () => {
               justify="between"
             />
           </div>
+
           {!hideOperator && (
             <div className="w-40">
               <Dropdown
@@ -246,10 +247,17 @@ const TableDetail = () => {
           </button>
         </div>
       </form>
-      <TableResult
-        results={filteredResults}
-        previousState={{ typeTable, typeColumn, typeOperator, filterCriteria }}
-      />
+      {isSubmited && (
+        <TableResult
+          results={filteredResults}
+          previousState={{
+            typeTable,
+            typeColumn,
+            typeOperator,
+            filterCriteria,
+          }}
+        />
+      )}
       {isDialogOpen && (
         <FilterDialog
           onClose={closeDialog}

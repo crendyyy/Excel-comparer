@@ -32,14 +32,14 @@ const FilterDialog = ({ onClose, onSubmit }) => {
 
   const handleConfirm = () => {
     let combinedFilters = [...savedFilters, ...filters];
-        if (value !== "") {
-          const latestFilter = {
-            operator: typeOperator,
-            value,
-            color,
-          };
-          combinedFilters = [...combinedFilters, latestFilter];
-        }
+    if (value !== "") {
+      const latestFilter = {
+        operator: typeOperator,
+        value,
+        color,
+      };
+      combinedFilters = [...combinedFilters, latestFilter];
+    }
     setSavedFilters(combinedFilters);
     onSubmit(combinedFilters);
     onClose();
@@ -154,38 +154,38 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               />
             </div>
           ))}
-          {savedFilters.length === 0 && 
-          <div className="flex h-8 gap-2">
-            <div className="w-fit">
-              <Dropdown
-                options={Operator}
-                value={typeOperator}
-                setValue={setTypeOperator}
-                px="2"
-                py="2"
-                rounded="lg"
-                border="primary"
-                justify="center"
+          {savedFilters.length === 0 && (
+            <div className="flex h-8 gap-2">
+              <div className="w-fit">
+                <Dropdown
+                  options={Operator}
+                  value={typeOperator}
+                  setValue={setTypeOperator}
+                  px="2"
+                  py="2"
+                  rounded="lg"
+                  border="primary"
+                  justify="center"
+                />
+              </div>
+              <input
+                type="text"
+                className="flex items-center w-full h-full px-4 border border-solid rounded-lg border-primary placeholder:text-base placeholder:font-medium placeholder:text-gray-400"
+                placeholder={`Pilih angka nya saja "5" %`}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+              <label htmlFor="favcolor" className="hidden"></label>
+              <input
+                type="color"
+                id="favcolor"
+                name="favcolor"
+                className="h-full border border-solid rounded-lg w-11 border-primary"
+                value={color}
+                onChange={handleColorPicker}
               />
             </div>
-            <input
-              type="text"
-              className="flex items-center w-full h-full px-4 border border-solid rounded-lg border-primary placeholder:text-base placeholder:font-medium placeholder:text-gray-400"
-              placeholder={`Pilih angka nya saja "5" %`}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-            <label htmlFor="favcolor" className="hidden"></label>
-            <input
-              type="color"
-              id="favcolor"
-              name="favcolor"
-              className="h-full border border-solid rounded-lg w-11 border-primary"
-              value={color}
-              onChange={handleColorPicker}
-            />
-          </div>
-        }
+          )}
           <button
             className="flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-primary text-primary"
             onClick={handleAddFilter}
@@ -197,7 +197,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
           <button
             onClick={onClose}
             className="flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-primary text-primary"
-            >
+          >
             Batalkan
           </button>
           <button
