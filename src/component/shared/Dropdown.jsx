@@ -43,7 +43,7 @@ const Dropdown = (props) => {
           props.py
         } ${
           isOpen
-            ? "!border-primary !bg-primary-lighten shadow-input outline-none"
+            ? "!border-blue-950 !bg-primary-lighten shadow-input outline-none"
             : ""
         } ${selectedValue ? "font-semibold text-base text-black" : ""}`}
       >

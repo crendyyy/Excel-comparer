@@ -34,7 +34,7 @@ const TableResult = ({ results, previousState }) => {
           <Link
             to={`/table/${encodeURIComponent(record.filename)}`}
             state={{ result: record, previousState }}
-            className="px-2 py-1 text-sm font-semibold text-white rounded-lg bg-primary"
+            className="px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950"
           >
             Detail
           </Link>
