@@ -14,3 +14,7 @@ body {
   color: #212427;
   scroll-behavior: smooth;
 }
+
+hr {
+  margin: 16px 0;
+}

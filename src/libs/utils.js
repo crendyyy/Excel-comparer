@@ -51,15 +51,15 @@ export const columnSorter = (column) => (a, b) => {
   return 0
 }
 
-export const findMatchCondition = (config, record) => {
+export const findMatchCondition = (config, value) => {
   const sortedConfig = config.sort((a, b) => b.value - a.value)
 
   const chosenConfig = sortedConfig.find((config) => {
-    if (config.type === 'greater_than' && Number(record.persentase) > Number(config.value)) {
+    if (config.type === 'greater_than' && Number(value) > Number(config.value)) {
       return true
-    } else if (config.type === 'lesser_than' && Number(record.persentase) < Number(config.value)) {
+    } else if (config.type === 'lesser_than' && Number(value) < Number(config.value)) {
       return true
-    } else if (config.type === 'equal' && Number(record.persentase) === Number(config.value)) {
+    } else if (config.type === 'equal' && Number(value) === Number(config.value)) {
       return true
     }
   })

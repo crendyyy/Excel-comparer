@@ -20,11 +20,15 @@ const useAxios = () => {
     return axiosClient.put(url, data, config)
   }
 
+  const _patch = (url, data = {}, config = {}) => {
+    return axiosClient.patch(url, data, config)
+  }
+
   const _delete = (url, config = {}) => {
     return axiosClient.delete(url, config)
   }
 
-  return { _get, _post, _put, _delete }
+  return { _get, _post, _put, _patch, _delete }
 }
 
 export default useAxios
