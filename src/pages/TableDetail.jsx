@@ -3,9 +3,10 @@ import FilterIcon from "../component/icons/FilterIcon";
 import useDialog from "../hooks/useDialog";
 import FilterDialog from "../component/dialog/FilterDialog";
 import TableResult from "../component/Table/TableResults";
-import { Select, Space } from "antd";
+import { Select } from "antd";
 import { FormContext } from "../context/FormContext";
 import { columns, operators } from "../libs/Enum";
+import { useSubmitExcel, useSubmitMissingSKU } from "../services/compare/useSubmitExcel";
 
 const TableDetail = () => {
   const {
@@ -34,6 +35,9 @@ const TableDetail = () => {
   const { isDialogOpen, openDialog, closeDialog } = useDialog();
   const mainFileRef = useRef(null);
   const secondaryFilesRef = useRef(null);
+
+  const submitExcelMutation = useSubmitExcel()
+  const submitMissingMutation = useSubmitMissingSKU()
 
   const types = [
     { id: 0, tableType: "Pilih E-comm" },
@@ -101,17 +105,18 @@ const TableDetail = () => {
     data.append("type", formData.type);
     data.append("targetColumn", formData.targetColumn);
 
-    const url =
+    const mutation =
       typeColumn === "sku_produk"
-        ? "http://localhost:3000/api/v1/excel/missing-sku"
-        : "http://localhost:3000/api/v1/excel/compare";
+        ? submitMissingMutation
+        : submitExcelMutation;
 
-    try {
-      const response = await fetch(url, { method: "POST", body: data });
-      if (!response.ok) throw new Error("Network response was not ok");
+      const response = await mutation.mutateAsync({data: data});
 
-      const result = await response.json();
+      const result = response.data
       console.log(result);
+      if (!result || !result.payload || !result.payload.results) {
+        throw new Error("Invalid response structure");
+      }
 
       const filteredData =
         typeColumn === "sku_produk"
@@ -121,9 +126,6 @@ const TableDetail = () => {
       setFilteredResults(filteredData);
       setIsSubmited(true);
       console.log("Filtered Results:", filteredData);
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-    }
   };
 
   const filterResults = (results, operator) => {

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Table, Checkbox, Button } from "antd";
 import ArrowLeft from "../icons/ArrowLeft";
 import axios from "axios";
 import { FormContext } from "../../context/FormContext";
+import { useSubmitSaveTask } from "../../services/compare/useSubmitExcel";
 
 const TableResultsDetail = () => {
   const { filename } = useParams();
@@ -12,6 +13,9 @@ const TableResultsDetail = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const { savedFilters } = useContext(FormContext);
+  const navigate = useNavigate()
+
+  const saveTaskMutation = useSubmitSaveTask()
 
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -254,16 +258,9 @@ const TableResultsDetail = () => {
         persentase: row.persentase,
       })),
     };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/tasks",
-        taskData
-      );
-      console.log("Task saved successfully:", response.data);
-    } catch (error) {
-      console.error("Error saving task:", error);
-    }
+    navigate('/tugas')
+    const response = await saveTaskMutation.mutateAsync({data: taskData})
+    console.log("Task saved successfully:", response.data);
   };
 
   const handleSaveTaskWeight = async () => {
@@ -295,16 +292,9 @@ const TableResultsDetail = () => {
         persentase: row.persentase,
       })),
     };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/tasks",
-        taskData
-      );
-      console.log("Task saved successfully:", response.data);
-    } catch (error) {
-      console.error("Error saving task:", error);
-    }
+    navigate('/tugas')
+    const response = await saveTaskMutation.mutateAsync({data: taskData})
+    console.log("Task saved successfully:", response.data);
   };
   console.log(previousState.typeTable);
   let saveTask =
