@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { SearchOutlined } from '@ant-design/icons'
 import { DatePicker, Flex, Input, Select, Table } from 'antd'
 import Badge from '../shared/Badge'
-import { ExcelType, TaskStatus } from '../../libs/Enum'
+import { ExcelType, TaskStatus } from '../../libs/enum'
 import { dateFormatter, filterResponse } from '../../libs/utils'
 
-const TaskListTable = ({ data, isLoading, selectedDate, onDateChange }) => {
+const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
   const navigate = useNavigate()
 
   const [filters, setFilters] = useState({
@@ -16,54 +16,55 @@ const TaskListTable = ({ data, isLoading, selectedDate, onDateChange }) => {
   })
 
   const handleFiltersChange = (field, value) => {
-    setFilters((prev) => ({
-      ...prev,
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       [field]: {
-        ...prev[field],
-        value: value,
+        ...prevFilters[field],
+        value,
       },
     }))
   }
 
-  const columns = [
-    {
-      title: 'Tanggal',
-      dataIndex: 'createdAt',
-      defaultSortOrder: 'descend',
-      sorter: (a, b) => dateFormatter(a.createdAt, true) - dateFormatter(b.createdAt, true),
-    },
-    {
-      title: 'Tugas',
-      dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: 'Tipe',
-      dataIndex: 'type',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: 'Kolom',
-      dataIndex: 'targetColumn',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (_, record) => getStatusBadge(record.status),
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-  ]
+  const filteredTasks = useMemo(() => {
+    return filterResponse(tasks, filters).map((task) => ({
+      ...task,
+      key: task.id,
+      createdAt: dateFormatter(task.createdAt),
+    }))
+  }, [tasks, filters])
 
-  const rows = useMemo(() => {
-    return filterResponse(data, filters).map((task) => {
-      return {
-        ...task,
-        key: task.id,
-        createdAt: dateFormatter(task.createdAt),
-      }
-    })
-  }, [data, filters])
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Tanggal',
+        dataIndex: 'createdAt',
+        defaultSortOrder: 'descend',
+        sorter: (a, b) => dateFormatter(a.createdAt, true) - dateFormatter(b.createdAt, true),
+      },
+      {
+        title: 'Tugas',
+        dataIndex: 'name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+      },
+      {
+        title: 'Tipe',
+        dataIndex: 'type',
+        sorter: (a, b) => a.type.localeCompare(b.type),
+      },
+      {
+        title: 'Kolom',
+        dataIndex: 'targetColumn',
+        sorter: (a, b) => a.targetColumn.localeCompare(b.targetColumn),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        render: (_, task) => getStatusBadge(task.status),
+        sorter: (a, b) => a.status.localeCompare(b.status),
+      },
+    ],
+    [],
+  )
 
   return (
     <>
@@ -111,23 +112,19 @@ const TaskListTable = ({ data, isLoading, selectedDate, onDateChange }) => {
 
       <Table
         pagination={{ pageSize: 8 }}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              navigate(`/tugas/${record.key}`)
-            },
-          }
-        }}
+        onRow={(record) => ({
+          onClick: () => navigate(`/tugas/${record.key}`),
+        })}
         loading={isLoading}
         bordered={true}
         columns={columns}
-        dataSource={rows}
+        dataSource={filteredTasks}
       />
     </>
   )
 }
 
-export default TaskListTable
+export default TaskTable
 
 const getStatusBadge = (status) => {
   switch (status) {

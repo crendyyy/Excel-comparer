@@ -3,7 +3,7 @@ import useAxios from '../../hooks/useAxios'
 import taskKeys from '.'
 import useLoadingToast from '../../hooks/useToast'
 
-export const useUpdateTask = () => {
+export const useCreateTask = () => {
   const queryClient = useQueryClient()
   const axiosClient = useAxios()
 
@@ -11,12 +11,12 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: ({ id, data }) => {
-      toast.loading('Memperbarui Status...')
-      return axiosClient._patch(`/v1/tasks/${id}`, data)
+      toast.loading('Membuat tugas...')
+      return axiosClient._post(`/v1/tasks/${id}`, data)
     },
 
     onSuccess: () => {
-      toast.update('Status diperbarui', 'success')
+      toast.update('Tugas dibuat', 'success')
       queryClient.invalidateQueries({ queryKey: taskKeys.lists })
     },
 
@@ -26,4 +26,4 @@ export const useUpdateTask = () => {
   })
 }
 
-export default useUpdateTask
+export default useCreateTask

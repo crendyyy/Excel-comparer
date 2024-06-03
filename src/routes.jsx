@@ -1,6 +1,6 @@
-import TableDetail from "./pages/TableDetail";
-import TaskListPage from './pages/TaskListPage'
-import TaskDetailPage from './pages/TaskDetailPage'
+import TableDetail from './pages/TableDetail'
+import TaskList from './pages/TaskList'
+import TaskDetail from './pages/TaskDetail'
 
 import TableResultsDetail from './component/Table/TableResultsDetail'
 import { Layout } from 'antd'
@@ -8,24 +8,35 @@ import { Content } from 'antd/es/layout/layout'
 import { Outlet } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import Aside from './component/shared/Aside'
+import { Bounce, ToastContainer } from 'react-toastify'
 
 const routes = [
   {
     path: '/',
     element: (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Layout>
-          <Sider width={240}>
-            <Aside />
-          </Sider>
+      <>
+        <ToastContainer
+          position='top-right'
+          autoClose={1000}
+          draggable={true}
+          transition={Bounce}
+          pauseOnHover={false}
+        />
 
-          <Content>
-            <main className='w-full'>
-              <Outlet />
-            </main>
-          </Content>
+        <Layout style={{ minHeight: '100vh' }}>
+          <Layout>
+            <Sider width={240}>
+              <Aside />
+            </Sider>
+
+            <Content>
+              <main className='w-full'>
+                <Outlet />
+              </main>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </>
     ),
     children: [
       { index: true, element: <TableDetail /> },
@@ -36,8 +47,8 @@ const routes = [
       {
         path: '/tugas',
         children: [
-          { index: true, element: <TaskListPage /> },
-          { path: ':taskId', element: <TaskDetailPage /> },
+          { index: true, element: <TaskList /> },
+          { path: ':taskId', element: <TaskDetail /> },
         ],
       },
     ],

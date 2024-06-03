@@ -16,53 +16,62 @@ export const dateFormatter = (dateStr, backward = false) => {
   return `${year}-${month}-${day} - ${hours}:${minutes}`
 }
 
-export const filterResponse = (response = [], filters = {}) => {
-  return response.filter((data) =>
-    Object.entries(filters).every(([key, filter]) => {
+export const filterResponse = (response = [], criteria = {}) => {
+  return response.filter((item) =>
+    Object.entries(criteria).every(([key, filter]) => {
       if (!filter.value) return true
 
       if (filter.regex) {
         const regex = new RegExp(filter.value, 'i')
-        return regex.test(data[key])
+        return regex.test(item[key])
       }
 
-      return data[key] === filter.value
+      return item[key] === filter.value
     }),
   )
 }
 
-export const columnSorter = (column) => (a, b) => {
-  const dataIndex = slugify(column, { replacement: '_', lower: true })
+export const columnSorter = (columnName) => (a, b) => {
+  const columnKey = slugify(columnName, { replacement: '_', lower: true })
 
-  const aValue = a[dataIndex]
-  const bValue = b[dataIndex]
+  const columnValueA = a[columnKey]
+  const columnValueB = b[columnKey]
 
-  const aNumber = Number(aValue)
-  const bNumber = Number(bValue)
+  const numericValueA = Number(columnValueA)
+  const numericValueB = Number(columnValueB)
 
-  if (!Number.isNaN(aNumber) && !Number.isNaN(bNumber)) {
-    return aNumber - bNumber
+  if (!isNaN(numericValueA) && !isNaN(numericValueB)) {
+    return numericValueA - numericValueB
   }
 
-  if (typeof aValue === 'string' && typeof bValue === 'string') {
-    return aValue.localeCompare(bValue)
+  if (typeof columnValueA === 'string' && typeof columnValueB === 'string') {
+    return columnValueA.localeCompare(columnValueB)
   }
 
   return 0
 }
 
-export const findMatchCondition = (config, value) => {
-  const sortedConfig = config.sort((a, b) => b.value - a.value)
+export const findMatchCondition = (conditions, targetValue) => {
+  if (conditions.length === 0) return {}
 
-  const chosenConfig = sortedConfig.find((config) => {
-    if (config.type === 'greater_than' && Number(value) > Number(config.value)) {
-      return true
-    } else if (config.type === 'lesser_than' && Number(value) < Number(config.value)) {
-      return true
-    } else if (config.type === 'equal' && Number(value) === Number(config.value)) {
-      return true
+  const sortedConditions = [...conditions].sort((a, b) => b.value - a.value)
+
+  const matchingCondition = sortedConditions.find((condition) => {
+    const { type, value } = condition
+    const targetNumber = Number(targetValue)
+    const conditionNumber = Number(value)
+
+    switch (type) {
+      case 'greater_than':
+        return targetNumber > conditionNumber
+      case 'lesser_than':
+        return targetNumber < conditionNumber
+      case 'equal':
+        return targetNumber === conditionNumber
+      default:
+        return false
     }
   })
 
-  return chosenConfig
+  return matchingCondition || {}
 }

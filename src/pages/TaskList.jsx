@@ -1,27 +1,33 @@
 import dayjs from 'dayjs'
 import { Flex } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Title from 'antd/es/typography/Title'
-
+import TaskTable from '../component/task/TaskTable'
 import { useGetAllTask } from '../services/tasks/useGetTask'
-import TaskListTable from '../component/task/TaskListTable'
+import { toast } from 'react-toastify'
 
-const TaskListPage = () => {
+const TaskList = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs(new Date()))
   const formattedDate = selectedDate?.format('YYYY-MM-DD')
+  const { data: tasks, isPending, isError } = useGetAllTask({ startDate: formattedDate })
 
-  const tasks = useGetAllTask({ startDate: formattedDate })
+  useEffect(() => {
+    if (isError) {
+      toast.error('Gagal, silahkan coba lagi', { autoClose: false })
+    }
+  }, [isError])
 
   return (
     <Flex vertical={true} gap={32} style={{ padding: 40 }}>
       <Title level={2}>Daftar Tugas</Title>
-      <TaskListTable
-        data={tasks.data?.payload}
-        isLoading={tasks.isPending}
+
+      <TaskTable
+        tasks={tasks?.payload}
+        isLoading={isPending}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
       />
     </Flex>
   )
 }
-export default TaskListPage
+export default TaskList
