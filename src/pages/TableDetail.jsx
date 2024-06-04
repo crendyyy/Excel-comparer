@@ -26,6 +26,8 @@ const TableDetail = () => {
     setMainFileName,
     secondaryFileNames,
     setSecondaryFileNames,
+    tableColumns,
+    setTableColumns,
     filteredResults,
     setFilteredResults,
     isSubmited,
@@ -98,6 +100,7 @@ const TableDetail = () => {
             : 'File Turunan'
       setSecondaryFileNames(truncatedNames)
     }
+    setResultsDuplicatesSecond([]); 
   }
 
   const handleSubmit = async (e) => {
@@ -121,6 +124,7 @@ const TableDetail = () => {
       const allDuplicates = result.payload.duplicated;
       const mainFileDuplicates = allDuplicates.filter(dup => dup.filename === formData.mainFile.name);
       const secondaryFilesDuplicates = allDuplicates.filter(dup => formData.secondaryFiles.some(file => file.name === dup.filename));
+      const tableColumns = result.payload.columns
 
     const filteredData =
       typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
@@ -128,7 +132,9 @@ const TableDetail = () => {
       setFilteredResults(filteredData);
       setResultsDuplicate(mainFileDuplicates)
       setResultsDuplicatesSecond(secondaryFilesDuplicates)
+      setTableColumns(tableColumns)
       setIsSubmited(true);
+      console.log(tableColumns);
       console.log("Filtered Results:", filteredData);
   };
 
@@ -246,7 +252,8 @@ const TableDetail = () => {
           typeColumn,
           typeOperator,
           filterCriteria,
-          resultsDuplicatesSecond, 
+          resultsDuplicatesSecond,
+          tableColumns, 
         }}
       />
       )}

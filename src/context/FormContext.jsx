@@ -17,6 +17,7 @@ export const FormProvider = ({ children }) => {
   const [filteredResults, setFilteredResults] = useState([]);
   const [resultsDuplicate, setResultsDuplicate] = useState([]);
   const [resultsDuplicatesSecond, setResultsDuplicatesSecond] = useState([]);
+  const [tableColumns, setTableColumns] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState([]);
   const [savedFilters, setSavedFilters] = useState([]);
   const [isSubmited, setIsSubmited] = useState(false);
@@ -43,6 +44,8 @@ export const FormProvider = ({ children }) => {
         setResultsDuplicate,
         resultsDuplicatesSecond,
         setResultsDuplicatesSecond,
+        tableColumns,
+        setTableColumns,
         isSubmited,
         setIsSubmited,
         hideOperator,

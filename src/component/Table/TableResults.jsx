@@ -27,23 +27,30 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
     {
       dataIndex: '',
       key: 'x',
-      render: (text, record) => (
-        <div className='flex justify-end w-full'>
-          <Link
-            to={`/table/${encodeURIComponent(record.filename)}`}
-            state={{ 
-              result: record, 
-              previousState: {
-                ...previousState,
-                secondaryDuplicates: secondaryDuplicates
-              }
-            }}
-            className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
-          >
-            Detail
-          </Link>
-        </div>
-      ),
+      render: (text, record) => {
+        // Temukan duplikat yang relevan dengan file ini
+        const relevantSecondaryDuplicates = secondaryDuplicates.filter(
+          dup => dup.filename === record.filename
+        );
+
+        return (
+          <div className='flex justify-end w-full'>
+            <Link
+              to={`/table/${encodeURIComponent(record.filename)}`}
+              state={{
+                result: record,
+                previousState: {
+                  ...previousState,
+                  secondaryDuplicates: relevantSecondaryDuplicates
+                }
+              }}
+              className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
+            >
+              Detail
+            </Link>
+          </div>
+        );
+      },
     },
   ]
 

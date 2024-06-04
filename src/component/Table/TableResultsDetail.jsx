@@ -8,7 +8,6 @@ import FilterDialog from "../dialog/FilterDialog";
 import { FormContext } from "../../context/FormContext";
 import useCreateTask from "../../services/tasks/useCreateTask";
 import useDialog from "../../hooks/useDialog";
-import { color } from "framer-motion";
 
 const TableResultsDetail = () => {
   const { filename } = useParams();
@@ -26,7 +25,6 @@ const TableResultsDetail = () => {
   const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn);
 
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys)
     setSelectedRows(newSelectedRows)
   }
@@ -47,7 +45,7 @@ const TableResultsDetail = () => {
         filter.operator === "lesser_than" &&
         record.persentase < filter.value
       ) {
-        return filter.color;
+        return filter.color ;
       } else if (
         filter.operator === "equal" &&
         record.persentase === filter.value
@@ -57,46 +55,82 @@ const TableResultsDetail = () => {
     }
     return "transparent";
   };
-  console.log(savedFilters);
+
+  const formatNumber = (number) => {
+    if (!number) return '0';
+    return parseInt(number, 10).toLocaleString('id-ID');
+  };
+
+  const renderCell = (text, record, slug) => {
+    const isTargetColumn = slug === processedTypeColumn;
+    const isNumericColumn = !['kode_produk', 'kode_variasi'].includes(slug);
+
+    const style = isTargetColumn
+      ? { backgroundColor: '#e5e7eb' }
+      : {};
+
+    const content = isNumericColumn && text !== '' && !isNaN(text)
+      ? formatNumber(text)
+      : text;
+
+    return {
+      props: { style },
+      children: content,
+    };
+  };
+
 
   const columns = [
     {
-      title: 'Nama Produk',
+      title:  previousState.tableColumns[1],
       dataIndex: 'nama_produk',
       key: 'nama_produk',
+      render: (text, record) => renderCell(text, record, 'nama_produk')
     },
     {
-      title: 'Kode Produk',
+      title: previousState.tableColumns[0],
       dataIndex: 'kode_produk',
       key: 'kode_produk',
+      render: (text, record) => renderCell(text, record, 'kode_produk')
     },
     {
-      title: 'Nama Variasi',
+      title: previousState.tableColumns[2],
+      dataIndex: 'kode_variasi',
+      key: 'kode_variasi',
+      render: (text, record) => renderCell(text, record, 'kode_variasi')
+    },
+    {
+      title:  previousState.tableColumns[3],
       dataIndex: 'nama_variasi',
       key: 'nama_variasi',
+      render: (text, record) => renderCell(text, record, 'nama_variasi')
     },
     {
-      title: 'SKU Induk',
+      title:  previousState.tableColumns[4],
       dataIndex: 'sku_induk',
       key: 'sku_induk',
+      render: (text, record) => renderCell(text, record, 'sku_induk')
     },
     {
-      title: 'SKU',
+      title: previousState.tableColumns[5],
       dataIndex: 'sku_produk',
       key: 'sku_produk',
+      render: (text, record) => renderCell(text, record, 'sku_produk')
     },
     {
-      title: 'Harga',
+      title: previousState.tableColumns[6],
       dataIndex: 'harga',
       key: 'harga_produk',
+      render: (text, record) => renderCell(text, record, 'harga')
     },
     {
-      title: 'Stok',
+      title: previousState.tableColumns[7],
       dataIndex: 'stok',
       key: 'stok_produk',
+      render: (text, record) => renderCell(text, record, 'stok')
     },
     {
-      title: 'Persentase',
+      title: previousState.tableColumns[9],
       dataIndex: 'persentase',
       key: 'persentase',
       render: (text, record) => {
@@ -115,85 +149,88 @@ const TableResultsDetail = () => {
       },
     },
     {
-      title: 'Selisih',
+      title: previousState.tableColumns[8],
       dataIndex: 'selisih',
       key: 'selisih',
       defaultSortOrder: 'descend',
       sorter: (a, b) => a.selisih - b.selisih,
-      render: (text, record) => {
-        return (
-          <span
-            style={{
-              backgroundColor: applyFilters(record),
-              padding: "0.5em",
-              borderRadius: "0.25em",
-            }}
-          >
-            {text ? text : "0"}
-          </span>
-        )
-      },
+      render: (text, record) => (
+        <span
+          style={{
+            backgroundColor: applyFilters(record),
+            padding: "0.5em",
+            borderRadius: "0.25em",
+          }}
+        >
+          {text ? text : "0"}
+        </span>
+      ),
     },
   ]
 
   const columnsWeight = [
     {
-      title: 'Kode Produk',
+      title: previousState.tableColumns[0],
       dataIndex: 'kode_produk',
       key: 'kode_produk',
+      render: (text, record) => renderCell(text, record, 'kode_produk')
     },
     {
-      title: 'SKU Induk',
+      title: previousState.tableColumns[1],
       dataIndex: 'sku_induk',
       key: 'sku_induk',
+      render: (text, record) => renderCell(text, record, 'sku_induk')
     },
     {
-      title: 'Nama Produk',
+      title: previousState.tableColumns[2],
       dataIndex: 'nama_produk',
       key: 'nama_produk',
+      render: (text, record) => renderCell(text, record, 'nama_produk')
     },
     {
-      title: 'Berat',
+      title: previousState.tableColumns[3],
       dataIndex: 'berat',
       key: 'berat',
+      render: (text, record) => renderCell(text, record, 'berat')
     },
     {
-      title: 'Panjang',
+      title: previousState.tableColumns[4],
       dataIndex: 'panjang',
       key: 'panjang',
+      render: (text, record) => renderCell(text, record, 'panjang')
     },
     {
-      title: 'Lebar',
+      title: previousState.tableColumns[5],
       dataIndex: 'lebar',
       key: 'lebar',
+      render: (text, record) => renderCell(text, record, 'lebar')
     },
     {
-      title: 'Tinggi',
+      title: previousState.tableColumns[6],
       dataIndex: 'tinggi',
       key: 'tinggi',
+      render: (text, record) => renderCell(text, record, 'tinggi')
     },
     {
-      title: 'Selisih',
+      title: previousState.tableColumns[7],
       dataIndex: 'selisih',
       key: 'selisih',
       defaultSortOrder: 'descend',
       sorter: (a, b) => a.selisih - b.selisih,
-      render: (text, record) => {
-        return (
-          <span
-            style={{
-              backgroundColor: applyFilters(record),
-              padding: "0.5em",
-              borderRadius: "0.25em",
-            }}
-          >
-            {text ? text : "0"}
-          </span>
-        )
-      },
+      render: (text, record) => (
+        <span
+          style={{
+            backgroundColor: applyFilters(record),
+            padding: "0.5em",
+            borderRadius: "0.25em",
+          }}
+        >
+          {text ? text : "0"}
+        </span>
+      ),
     },
     {
-      title: 'Persentase',
+      title: previousState.tableColumns[8],
       dataIndex: 'persentase',
       key: 'persentase',
       render: (text, record) => {
@@ -279,7 +316,6 @@ const TableResultsDetail = () => {
     const response = await saveTaskMutation.mutateAsync({ data: taskData })
     console.log('Task saved successfully:', response.data)
   }
-  console.log(previousState.typeTable)
   let saveTask = previousState.typeTable === 'shopee_product' ? handleSaveTask : handleSaveTaskWeight
 
   const columnsDuplicate = [
@@ -298,16 +334,20 @@ const TableResultsDetail = () => {
     },
   ];
 
-  // Data untuk tabel duplikat
-  const dataDuplicateSecondary = previousState.secondaryDuplicates.flatMap((dup, index) =>
+
+  const dataDuplicateSecondary = previousState.secondaryDuplicates?.flatMap((dup, index) =>
     dup.rows.map((row, rowIndex) => ({
       key: `${index}-${rowIndex}`,
       value: row.value,
       numbers: row.numbers,
     }))
-  );
+  ) || [];
 
-  const hasSecondaryDuplicates = previousState.secondaryDuplicates && previousState.secondaryDuplicates.length > 0;
+
+  const hasSecondaryDuplicates = 
+    previousState.secondaryDuplicates && 
+    previousState.secondaryDuplicates.length > 0 && 
+    previousState.secondaryDuplicates.some(dup => dup.filename === filename);
 
   return (
     <div className="flex flex-col gap-8 p-10">
