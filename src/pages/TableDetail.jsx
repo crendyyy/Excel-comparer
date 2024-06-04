@@ -1,12 +1,14 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import FilterIcon from '../component/icons/FilterIcon'
-import useDialog from '../hooks/useDialog'
-import FilterDialog from '../component/dialog/FilterDialog'
-import TableResult from '../component/Table/TableResults'
-import { Select } from 'antd'
-import { FormContext } from '../context/FormContext'
-import { columns, operators } from '../libs/enum'
-import { useSubmitExcel, useSubmitMissingSKU } from '../services/compare/useSubmitExcel'
+import { useContext, useEffect, useRef, useState } from "react";
+import FilterIcon from "../component/icons/FilterIcon";
+import useDialog from "../hooks/useDialog";
+import FilterDialog from "../component/dialog/FilterDialog";
+import TableResult from "../component/Table/TableResults";
+import { Select } from "antd";
+import { FormContext } from "../context/FormContext";
+import { columns, operators } from "../libs/enum";
+import {useCompareExcel} from "../services/excels/useCompareExcel";
+import { useCompareSKUExcel } from "../services/excels/useGetMissingSku";
+import Title from "antd/es/typography/Title";
 
 const TableDetail = () => {
   const {
@@ -30,14 +32,16 @@ const TableDetail = () => {
     hideOperator,
     setHideOperator,
     setFilterCriteria,
-  } = useContext(FormContext)
+    resultsDuplicate,
+    setResultsDuplicate,
+  } = useContext(FormContext);
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
   const secondaryFilesRef = useRef(null)
 
-  const submitExcelMutation = useSubmitExcel()
-  const submitMissingMutation = useSubmitMissingSKU()
+  const submitExcelMutation = useCompareExcel()
+  const submitMissingMutation = useCompareSKUExcel()
 
   const types = [
     { id: 0, tableType: 'Pilih E-comm' },
@@ -105,19 +109,22 @@ const TableDetail = () => {
 
     const response = await mutation.mutateAsync({ data: data })
 
-    const result = response.data
-    console.log(result)
-    if (!result || !result.payload || !result.payload.results) {
-      throw new Error('Invalid response structure')
-    }
+      const result = response.data
+      console.log(result);
+      if (!result || !result.payload) {
+        throw new Error("Invalid response structure");
+      }
+
+      const duplicateData = result.payload.duplicated
 
     const filteredData =
       typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
 
-    setFilteredResults(filteredData)
-    setIsSubmited(true)
-    console.log('Filtered Results:', filteredData)
-  }
+      setFilteredResults(filteredData);
+      setResultsDuplicate(duplicateData)
+      setIsSubmited(true);
+      console.log("Filtered Results:", filteredData);
+  };
 
   const filterResults = (results, operator) => {
     return results.map((fileResult) => {
@@ -138,36 +145,41 @@ const TableDetail = () => {
   }
 
   return (
-    <div className='flex flex-col gap-8 p-10'>
-      <h1 className='font-bold'>Table Detail</h1>
-      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
-        <div className='flex gap-6'>
+    <div className="flex flex-col gap-8 p-10">
+    <Title level={2}>Daftar Tugas</Title>
+      <form
+        onSubmit={handleSubmit}
+        className="flex justify-between w-full p-6 bg-white rounded-lg"
+      >
+        <div className="flex gap-6">
           <label
             htmlFor='main-file'
-            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+            className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
           >
             {mainFileName}
           </label>
           <input
-            name='main-file'
-            type='file'
-            id='main-file'
-            className='hidden'
+            name="main-file"
+            type="file"
+            id="main-file"
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            className="hidden"
             onChange={handleFileChange}
             required
             ref={mainFileRef}
           />
           <label
             htmlFor='compares-file'
-            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+            className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
           >
             {secondaryFileNames}
           </label>
           <input
-            name='compares-file'
-            type='file'
-            id='compares-file'
-            className='hidden'
+            name="compares-file"
+            type="file"
+            id="compares-file"
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            className="hidden"
             multiple
             onChange={handleFileChange}
             required
@@ -221,6 +233,7 @@ const TableDetail = () => {
       {isSubmited && (
         <TableResult
           results={filteredResults}
+          duplicate={resultsDuplicate}
           previousState={{
             typeTable,
             typeColumn,

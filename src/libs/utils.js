@@ -56,6 +56,7 @@ export const findMatchCondition = (conditions, targetValue) => {
 
   const sortedConditions = [...conditions].sort((a, b) => b.value - a.value)
 
+
   const matchingCondition = sortedConditions.find((condition) => {
     const { type, value } = condition
     const targetNumber = Number(targetValue)

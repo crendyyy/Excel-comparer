@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import useAxios from '../../hooks/useAxios'
 import useLoadingToast from '../../hooks/useToast'
 
-export const useCompareExcel = () => {
+export const useCompareSKUExcel = () => {
   const axiosClient = useAxios()
 
   const toast = useLoadingToast()
@@ -23,4 +23,4 @@ export const useCompareExcel = () => {
   })
 }
 
-export default useCompareExcel
+export default useCompareSKUExcel

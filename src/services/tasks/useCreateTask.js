@@ -10,9 +10,9 @@ export const useCreateTask = () => {
   const toast = useLoadingToast()
 
   return useMutation({
-    mutationFn: ({ id, data }) => {
+    mutationFn: ({ data }) => {
       toast.loading('Membuat tugas...')
-      return axiosClient._post(`/v1/tasks/${id}`, data)
+      return axiosClient._post(`/v1/tasks`, data)
     },
 
     onSuccess: () => {

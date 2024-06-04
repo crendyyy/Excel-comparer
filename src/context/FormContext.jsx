@@ -7,7 +7,7 @@ export const FormProvider = ({ children }) => {
     mainFile: null,
     secondaryFiles: [],
     type: "",
-    targetColumn: "Pilih Kolum",
+    targetColumn: "",
   });
   const [typeColumn, setTypeColumn] = useState("Pilih Kolum");
   const [typeOperator, setTypeOperator] = useState("Pilih Operator");
@@ -15,6 +15,7 @@ export const FormProvider = ({ children }) => {
   const [mainFileName, setMainFileName] = useState("File Utama");
   const [secondaryFileNames, setSecondaryFileNames] = useState("File Turunan");
   const [filteredResults, setFilteredResults] = useState([]);
+  const [resultsDuplicate, setResultsDuplicate] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState([]);
   const [savedFilters, setSavedFilters] = useState([]);
   const [isSubmited, setIsSubmited] = useState(false);
@@ -37,6 +38,8 @@ export const FormProvider = ({ children }) => {
         setSecondaryFileNames,
         filteredResults,
         setFilteredResults,
+        resultsDuplicate,
+        setResultsDuplicate,
         isSubmited,
         setIsSubmited,
         hideOperator,

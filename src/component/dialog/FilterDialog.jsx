@@ -12,19 +12,26 @@ const FilterDialog = ({ onClose, onSubmit }) => {
   const [typeOperator, setTypeOperator] = useState('=')
   const [value, setValue] = useState('')
   const { savedFilters, setSavedFilters } = useContext(FormContext)
+  
+  const sortFilter = savedFilters.sort((a, b) => b.value - a.value)
 
   const handleColorPicker = (e) => {
     setColor(e.target.value)
   }
 
   const handleAddFilter = () => {
-    const newFilter = {
-      operator: typeOperator,
-      value: '',
-      color: '#ffffff',
+    if (value !== '') {
+      const newFilter = {
+        operator: typeOperator,
+        value,
+        color,
+      };
+      setFilters([...filters, newFilter]);
+      setValue(''); 
+      setColor('#ffffff'); 
+      setTypeOperator('=');
     }
-    setFilters([...filters, newFilter])
-  }
+  };
 
   const handleConfirm = () => {
     let combinedFilters = [...savedFilters, ...filters]
@@ -56,7 +63,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
       <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
         <div className='flex flex-col gap-2'>
           <span className='text-base font-bold'>Filter Warna</span>
-          {savedFilters.map((filter, index) => (
+          {sortFilter.map((filter, index) => (
             <div className='flex h-8 gap-2' key={index}>
               <div className='w-fit'>
                 <Select

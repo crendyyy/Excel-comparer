@@ -1,8 +1,8 @@
-import React from 'react'
-import { Table } from 'antd'
-import { Link } from 'react-router-dom'
+import React from "react";
+import { Flex, Table } from "antd";
+import { Link } from "react-router-dom";
 
-const TableResult = ({ results, previousState }) => {
+const TableResult = ({ results, previousState, duplicate }) => {
   const columns = [
     {
       title: 'No',
@@ -24,11 +24,11 @@ const TableResult = ({ results, previousState }) => {
       dataIndex: '',
       key: 'x',
       render: (text, record) => (
-        <div className='flex w-full justify-end'>
+        <div className='flex justify-end w-full'>
           <Link
             to={`/table/${encodeURIComponent(record.filename)}`}
             state={{ result: record, previousState }}
-            className='rounded-lg bg-blue-950 px-2 py-1 text-sm font-semibold text-white'
+            className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
           >
             Detail
           </Link>
@@ -44,7 +44,37 @@ const TableResult = ({ results, previousState }) => {
     rows: result.rows,
   }))
 
-  return <Table columns={columns} dataSource={data} pagination={false} />
-}
+  const columnsDuplicate = [
+    {
+      title: "SKU",
+      dataIndex: "value",
+      key: "value",
+    },
+    {
+      title: "Columns",
+      dataIndex: "numbers",
+      key: "numbers",
+      render: (text, record) => (
+        <span className="text-sm font-normal">{record.numbers.join(", ")}</span>
+      ),
+    },
+  ];
+
+  // Data untuk tabel duplikat
+  const dataDuplicate = duplicate.flatMap((dup, index) =>
+    dup.rows.map((row, rowIndex) => ({
+      key: `${index}-${rowIndex}`,
+      value: row.value,
+      numbers: row.numbers,
+    }))
+  );
+
+  return(
+    <Flex vertical gap='middle'>
+      <Table columns={columnsDuplicate} dataSource={dataDuplicate} pagination={false}/>
+     <Table columns={columns} dataSource={data} pagination={false} />
+    </Flex>
+     );
+};
 
 export default TableResult
