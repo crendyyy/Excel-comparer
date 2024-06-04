@@ -3,16 +3,15 @@ import slugify from 'slugify'
 import PropTypes from 'prop-types'
 import { columnSorter, findMatchCondition } from '../../libs/utils'
 
-const TaskSheet = ({ task, isLoading }) => {
+const TaskSheet = ({ task, columns, isLoading }) => {
   const rows = task.rows || []
-  const columns = task.columns || []
 
   const dataSource = rows.map((row, index) => ({
     ...row,
     key: index,
   }))
 
-  const columnConfig = columns.map((label) => {
+  const columnConfig = (columns || []).map((label) => {
     const slug = slugify(label, { replacement: '_', lower: true })
     const isNumericColumn = !['kode_produk', 'kode_variasi'].includes(slug)
 
@@ -58,6 +57,7 @@ const TaskSheet = ({ task, isLoading }) => {
 
 TaskSheet.propTypes = {
   task: PropTypes.object,
+  columns: PropTypes.array,
   isLoading: PropTypes.bool.isRequired,
 }
 

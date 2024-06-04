@@ -55,7 +55,7 @@ const TaskDetail = () => {
 
   return (
     <Flex vertical={true} gap={32} style={{ padding: 40 }}>
-      {showResult && <TaskResult result={result} isLoading={isPending} toggleHide={() => setShowResult(false)} />}
+      {showResult && <TaskResult task={result} isLoading={isPending} onHide={() => setShowResult(false)} />}
 
       <Flex className={showResult ? 'hidden' : ''} vertical={true} gap={24}>
         <Flex justify='space-between'>
@@ -80,7 +80,7 @@ const TaskDetail = () => {
           </Flex>
         </Flex>
 
-        {!showResult && <TaskSheet task={task?.payload || {}} isLoading={isPending} />}
+        {!showResult && <TaskSheet task={task?.payload || {}} columns={task?.payload.columns} isLoading={isPending} />}
       </Flex>
     </Flex>
   )
