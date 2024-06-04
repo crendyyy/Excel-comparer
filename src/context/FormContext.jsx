@@ -16,6 +16,7 @@ export const FormProvider = ({ children }) => {
   const [secondaryFileNames, setSecondaryFileNames] = useState("File Turunan");
   const [filteredResults, setFilteredResults] = useState([]);
   const [resultsDuplicate, setResultsDuplicate] = useState([]);
+  const [resultsDuplicatesSecond, setResultsDuplicatesSecond] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState([]);
   const [savedFilters, setSavedFilters] = useState([]);
   const [isSubmited, setIsSubmited] = useState(false);
@@ -40,6 +41,8 @@ export const FormProvider = ({ children }) => {
         setFilteredResults,
         resultsDuplicate,
         setResultsDuplicate,
+        resultsDuplicatesSecond,
+        setResultsDuplicatesSecond,
         isSubmited,
         setIsSubmited,
         hideOperator,

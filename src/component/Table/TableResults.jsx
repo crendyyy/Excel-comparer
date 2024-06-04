@@ -1,8 +1,12 @@
 import React from "react";
 import { Flex, Table } from "antd";
 import { Link } from "react-router-dom";
+import Text from 'antd/es/typography/Text'
 
-const TableResult = ({ results, previousState, duplicate }) => {
+const TableResult = ({ results, previousState, duplicate, secondaryDuplicates }) => {
+  const processedTypeColumn = previousState.typeColumn;
+  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn);
+
   const columns = [
     {
       title: 'No',
@@ -27,7 +31,13 @@ const TableResult = ({ results, previousState, duplicate }) => {
         <div className='flex justify-end w-full'>
           <Link
             to={`/table/${encodeURIComponent(record.filename)}`}
-            state={{ result: record, previousState }}
+            state={{ 
+              result: record, 
+              previousState: {
+                ...previousState,
+                secondaryDuplicates: secondaryDuplicates
+              }
+            }}
             className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
           >
             Detail
@@ -46,7 +56,7 @@ const TableResult = ({ results, previousState, duplicate }) => {
 
   const columnsDuplicate = [
     {
-      title: "SKU",
+      title: isDuplicateSKU ? 'SKU' : 'Kode Produk',
       dataIndex: "value",
       key: "value",
     },
@@ -69,9 +79,19 @@ const TableResult = ({ results, previousState, duplicate }) => {
     }))
   );
 
+  const hasDuplicate = duplicate && duplicate.length > 0;
+  
   return(
     <Flex vertical gap='middle'>
+      {hasDuplicate && (
+        <Flex vertical gap='middle'>
+        <Text className='text-red-600'>
+            Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang diberikan. Baris berikut
+            tidak dapat diproses.
+          </Text>
       <Table columns={columnsDuplicate} dataSource={dataDuplicate} pagination={false}/>
+        </Flex>
+        )}
      <Table columns={columns} dataSource={data} pagination={false} />
     </Flex>
      );

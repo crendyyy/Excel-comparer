@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Table, Checkbox, Button } from "antd";
+import { Table, Checkbox, Button, Flex } from "antd";
+import Text from 'antd/es/typography/Text'
 import ArrowLeft from "../icons/ArrowLeft";
 import FilterIcon from "../icons/FilterIcon";
 import FilterDialog from "../dialog/FilterDialog";
@@ -20,6 +21,9 @@ const TableResultsDetail = () => {
   const navigate = useNavigate()
 
   const saveTaskMutation = useCreateTask()
+
+  const processedTypeColumn = previousState.typeColumn;
+  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn);
 
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)
@@ -278,6 +282,33 @@ const TableResultsDetail = () => {
   console.log(previousState.typeTable)
   let saveTask = previousState.typeTable === 'shopee_product' ? handleSaveTask : handleSaveTaskWeight
 
+  const columnsDuplicate = [
+    {
+      title: isDuplicateSKU ? 'SKU' : 'Kode Produk',
+      dataIndex: "value",
+      key: "value",
+    },
+    {
+      title: "Columns",
+      dataIndex: "numbers",
+      key: "numbers",
+      render: (text, record) => (
+        <span className="text-sm font-normal">{record.numbers.join(", ")}</span>
+      ),
+    },
+  ];
+
+  // Data untuk tabel duplikat
+  const dataDuplicateSecondary = previousState.secondaryDuplicates.flatMap((dup, index) =>
+    dup.rows.map((row, rowIndex) => ({
+      key: `${index}-${rowIndex}`,
+      value: row.value,
+      numbers: row.numbers,
+    }))
+  );
+
+  const hasSecondaryDuplicates = previousState.secondaryDuplicates && previousState.secondaryDuplicates.length > 0;
+
   return (
     <div className="flex flex-col gap-8 p-10">
       {isDialogOpen && (
@@ -303,6 +334,15 @@ const TableResultsDetail = () => {
             <FilterIcon />
           </button>
       </div>
+      {hasSecondaryDuplicates && (
+        <Flex vertical gap='middle'>
+        <Text className='text-red-600'>
+            Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang diberikan. Baris berikut
+            tidak dapat diproses.
+          </Text>
+      <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={false}/>
+        </Flex>
+        )}
       <Table
         className='custom-table-header'
         onChange={onChange}

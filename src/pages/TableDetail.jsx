@@ -9,6 +9,7 @@ import { columns, operators } from "../libs/enum";
 import {useCompareExcel} from "../services/excels/useCompareExcel";
 import { useCompareSKUExcel } from "../services/excels/useGetMissingSku";
 import Title from "antd/es/typography/Title";
+import { xlsxMimeType } from "../libs/const";
 
 const TableDetail = () => {
   const {
@@ -34,6 +35,8 @@ const TableDetail = () => {
     setFilterCriteria,
     resultsDuplicate,
     setResultsDuplicate,
+    resultsDuplicatesSecond,
+    setResultsDuplicatesSecond,
   } = useContext(FormContext);
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
@@ -115,13 +118,16 @@ const TableDetail = () => {
         throw new Error("Invalid response structure");
       }
 
-      const duplicateData = result.payload.duplicated
+      const allDuplicates = result.payload.duplicated;
+      const mainFileDuplicates = allDuplicates.filter(dup => dup.filename === formData.mainFile.name);
+      const secondaryFilesDuplicates = allDuplicates.filter(dup => formData.secondaryFiles.some(file => file.name === dup.filename));
 
     const filteredData =
       typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
 
       setFilteredResults(filteredData);
-      setResultsDuplicate(duplicateData)
+      setResultsDuplicate(mainFileDuplicates)
+      setResultsDuplicatesSecond(secondaryFilesDuplicates)
       setIsSubmited(true);
       console.log("Filtered Results:", filteredData);
   };
@@ -162,7 +168,7 @@ const TableDetail = () => {
             name="main-file"
             type="file"
             id="main-file"
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            accept={xlsxMimeType}
             className="hidden"
             onChange={handleFileChange}
             required
@@ -178,7 +184,7 @@ const TableDetail = () => {
             name="compares-file"
             type="file"
             id="compares-file"
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            accept={xlsxMimeType}
             className="hidden"
             multiple
             onChange={handleFileChange}
@@ -232,15 +238,17 @@ const TableDetail = () => {
       </form>
       {isSubmited && (
         <TableResult
-          results={filteredResults}
-          duplicate={resultsDuplicate}
-          previousState={{
-            typeTable,
-            typeColumn,
-            typeOperator,
-            filterCriteria,
-          }}
-        />
+        results={filteredResults}
+        duplicate={resultsDuplicate}
+        secondaryDuplicates={resultsDuplicatesSecond} 
+        previousState={{
+          typeTable,
+          typeColumn,
+          typeOperator,
+          filterCriteria,
+          resultsDuplicatesSecond, 
+        }}
+      />
       )}
       {isDialogOpen && (
         <FilterDialog
