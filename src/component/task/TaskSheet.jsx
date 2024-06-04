@@ -57,9 +57,7 @@ const TaskSheet = ({ task, columns, isLoading }) => {
     }
   })
 
-  return (
-    <Table pagination={{ pageSize: 10 }} loading={isLoading} bordered columns={columnConfig} dataSource={dataSource} />
-  )
+  return <Table pagination={true} loading={isLoading} bordered columns={columnConfig} dataSource={dataSource} />
 }
 
 TaskSheet.propTypes = {

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
-import { Button, Flex, Table, Tooltip } from 'antd'
-import Title from 'antd/es/typography/Title'
+import { Button, Flex, Table } from 'antd'
 import Text from 'antd/es/typography/Text'
-import { ArrowLeftOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import Title from 'antd/es/typography/Title'
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import TaskSheet from './TaskSheet'
 import useUpdateTask from '../../services/tasks/useUpdateTask'
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { columnSorter } from '../../libs/utils'
 
 const TaskResult = ({ task, isLoading, onHide }) => {
   const navigate = useNavigate()
@@ -15,15 +15,16 @@ const TaskResult = ({ task, isLoading, onHide }) => {
   const hasDuplicate = task.duplicated.length > 0
 
   const handleUpdateStatus = async (status) => {
-    await updateTaskMutation.mutateAsync({
-      id: task.id,
-      data: { status },
-    })
+    await updateTaskMutation.mutateAsync(
+      {
+        id: task.id,
+        data: { status },
+      },
+      {
+        onSuccess: () => navigate('/tugas'),
+      },
+    )
   }
-
-  useEffect(() => {
-    if (updateTaskMutation.isSuccess) navigate('/tugas')
-  }, [updateTaskMutation.isSuccess, navigate])
 
   return (
     <Flex vertical={true} gap={40}>
@@ -48,11 +49,11 @@ const TaskResult = ({ task, isLoading, onHide }) => {
 
           <Table
             columns={[
-              { title: task.excel.primaryColumn, dataIndex: 'value' },
-              { title: 'Nomor Baris', dataIndex: 'numbers' },
+              { title: task.excel.primaryColumn, dataIndex: 'value', sorter: columnSorter('value') },
+              { title: 'Nomor Baris', dataIndex: 'numbers', sorter: columnSorter('numbers') },
             ]}
             dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.numbers.join(', ') }))}
-            pagination={false}
+            pagination={true}
           ></Table>
         </Flex>
       )}

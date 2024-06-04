@@ -111,7 +111,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       </Flex>
 
       <Table
-        pagination={{ pageSize: 8 }}
+        pagination={true}
         onRow={(record) => ({
           onClick: () => navigate(`/tugas/${record.key}`),
         })}
