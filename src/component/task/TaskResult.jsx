@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
-import { Button, Flex } from 'antd'
+import { Button, Flex, Table, Tooltip } from 'antd'
 import Title from 'antd/es/typography/Title'
 import Text from 'antd/es/typography/Text'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import TaskSheet from './TaskSheet'
 import useUpdateTask from '../../services/tasks/useUpdateTask'
 import { useEffect } from 'react'
@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom'
 const TaskResult = ({ task, isLoading, onHide }) => {
   const navigate = useNavigate()
   const updateTaskMutation = useUpdateTask()
+
+  const hasDuplicate = task.duplicated.length > 0
 
   const handleUpdateStatus = async (status) => {
     await updateTaskMutation.mutateAsync({
@@ -37,44 +39,83 @@ const TaskResult = ({ task, isLoading, onHide }) => {
         <Title level={3}>Sisa Tugas</Title>
       </Flex>
 
-      <Flex vertical={true} gap={16}>
-        <Text italic className='text-red-600'>
-          ini merupakan isi dari file yang diupload
-        </Text>
+      {hasDuplicate && (
+        <Flex vertical={true} gap={24} className='pb-10'>
+          <Text className='text-red-600'>
+            Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan. Baris berikut
+            tidak dapat diproses.
+          </Text>
 
-        <ul className='flex gap-4'>
-          <li className='flex items-center gap-2'>
-            <span className='h-2 w-2 rounded-full bg-[#8be78d]'></span>Sudah berubah
-          </li>
-          <li className='flex items-center gap-2'>
-            <span className='h-2 w-2 rounded-full bg-[#a2a8ad]'></span>Belum berubah
-          </li>
-        </ul>
-      </Flex>
+          <Table
+            columns={[
+              { title: task.excel.primaryColumn, dataIndex: 'value' },
+              { title: 'Nomor Baris', dataIndex: 'numbers' },
+            ]}
+            dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.numbers.join(', ') }))}
+            pagination={false}
+          ></Table>
+        </Flex>
+      )}
 
-      <TaskSheet
-        isLoading={isLoading}
-        columns={[...task.columns.slice(0, -2), 'Sebelumnya', 'Persentase']}
-        task={task}
-      />
+      <Flex vertical={true} gap={24}>
+        <Flex justify='space-between'>
+          <Flex gap={16}>
+            <ul className='flex flex-wrap gap-4'>
+              {task.config.map((item) => {
+                const operator =
+                  item.type === 'greater_than'
+                    ? '>'
+                    : item.type === 'lesser_than'
+                      ? '<'
+                      : item.type === 'equal'
+                        ? '='
+                        : ''
 
-      <Flex gap={16}>
-        <Button
-          style={{ height: 40, background: '#17c964' }}
-          type='primary'
-          size='middle'
-          onClick={() => handleUpdateStatus('done')}
-        >
-          Selesai
-        </Button>
-        <Button
-          style={{ height: 40, background: '#f31260' }}
-          type='primary'
-          size='middle'
-          onClick={() => handleUpdateStatus('revision')}
-        >
-          Revisi
-        </Button>
+                return (
+                  <li key={item.id} className='flex items-center gap-2'>
+                    <span className='rounded-full px-3 py-1' style={{ backgroundColor: item.color }}>
+                      {operator} {new Intl.NumberFormat('id-ID').format(item.value)}%
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </Flex>
+
+          <ul className='flex gap-4'>
+            <li className='flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-[#8be78d]'></span>Sudah berubah
+            </li>
+            <li className='flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-[#a2a8ad]'></span>Belum berubah
+            </li>
+          </ul>
+        </Flex>
+
+        <TaskSheet
+          isLoading={isLoading}
+          columns={[...task.columns.slice(0, -2), 'Sebelumnya', 'Persentase']}
+          task={task}
+        />
+
+        <Flex gap={16}>
+          <Button
+            style={{ height: 40, background: '#17c964' }}
+            type='primary'
+            size='middle'
+            onClick={() => handleUpdateStatus('done')}
+          >
+            Selesai
+          </Button>
+          <Button
+            style={{ height: 40, background: '#f31260' }}
+            type='primary'
+            size='middle'
+            onClick={() => handleUpdateStatus('revision')}
+          >
+            Revisi
+          </Button>
+        </Flex>
       </Flex>
     </Flex>
   )

@@ -22,7 +22,7 @@ const TaskSheet = ({ task, columns, isLoading }) => {
         if (slug === 'persentase') {
           const { color } = findMatchCondition(task.config, text)
           return (
-            <span className='rounded-xl px-2 py-1' style={{ backgroundColor: color }}>
+            <span className='rounded-full px-3 py-1' style={{ backgroundColor: color }}>
               {new Intl.NumberFormat('id-ID').format(text)}%
             </span>
           )
@@ -33,7 +33,14 @@ const TaskSheet = ({ task, columns, isLoading }) => {
         }
       }
 
-      const style = slug === task.targetColumn ? { background: record.isModified ? '#8be78d' : '#e5e7eb' } : {}
+      const style =
+        slug === task.targetColumn
+          ? record.isModified
+            ? { background: '#8be78d', color: '#006644' }
+            : { background: '#e5e7eb' }
+          : slug === 'sebelumnya'
+            ? { background: '#fee7e7', color: '#ad1f1f' }
+            : {}
 
       return {
         props: { style },
