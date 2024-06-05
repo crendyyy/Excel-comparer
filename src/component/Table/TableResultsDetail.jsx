@@ -22,6 +22,7 @@ const TableResultsDetail = () => {
   const saveTaskMutation = useCreateTask()
 
   const processedTypeColumn = previousState.typeColumn;
+
   const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn);
 
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
@@ -56,6 +57,7 @@ const TableResultsDetail = () => {
     return "transparent";
   };
 
+
   const formatNumber = (number) => {
     if (!number) return '0';
     return parseInt(number, 10).toLocaleString('id-ID');
@@ -79,178 +81,45 @@ const TableResultsDetail = () => {
     };
   };
 
+  const generateColumns = (tableColumns) => {
+    return tableColumns.map((col) => {
+      const key = col.toLowerCase().replace(' ', '_');
+      if (key === 'persentase' || key === 'selisih') {
+        return {
+          title: col,
+          dataIndex: key,
+          key: key,
+          render: (text, record) => {
+            const formattedValue = key === 'persentase' 
+              ? (text ? parseFloat(text).toFixed(1) : "0") + "%"
+              : (text ? previousState.typeColumn === "berat" ? text : formatNumber(text) : "0");
+            return (
+              <span
+                style={{
+                  backgroundColor: applyFilters(record),
+                  padding: "0.5em",
+                  borderRadius: "0.25em",
+                }}
+              >
+                {formattedValue}
+              </span>
+            );
+          },
+          sorter: key === 'selisih' ? (a, b) => a.selisih - b.selisih : undefined,
+          defaultSortOrder: key === 'selisih' ? 'descend' : undefined
+        };
+      } else {
+        return {
+          title: col,
+          dataIndex: key,
+          key: key,
+          render: (text, record) => renderCell(text, record, key)
+        };
+      }
+    });
+  };
 
-  const columns = [
-    {
-      title:  previousState.tableColumns[1],
-      dataIndex: 'nama_produk',
-      key: 'nama_produk',
-      render: (text, record) => renderCell(text, record, 'nama_produk')
-    },
-    {
-      title: previousState.tableColumns[0],
-      dataIndex: 'kode_produk',
-      key: 'kode_produk',
-      render: (text, record) => renderCell(text, record, 'kode_produk')
-    },
-    {
-      title: previousState.tableColumns[2],
-      dataIndex: 'kode_variasi',
-      key: 'kode_variasi',
-      render: (text, record) => renderCell(text, record, 'kode_variasi')
-    },
-    {
-      title:  previousState.tableColumns[3],
-      dataIndex: 'nama_variasi',
-      key: 'nama_variasi',
-      render: (text, record) => renderCell(text, record, 'nama_variasi')
-    },
-    {
-      title:  previousState.tableColumns[4],
-      dataIndex: 'sku_induk',
-      key: 'sku_induk',
-      render: (text, record) => renderCell(text, record, 'sku_induk')
-    },
-    {
-      title: previousState.tableColumns[5],
-      dataIndex: 'sku_produk',
-      key: 'sku_produk',
-      render: (text, record) => renderCell(text, record, 'sku_produk')
-    },
-    {
-      title: previousState.tableColumns[6],
-      dataIndex: 'harga',
-      key: 'harga_produk',
-      render: (text, record) => renderCell(text, record, 'harga')
-    },
-    {
-      title: previousState.tableColumns[7],
-      dataIndex: 'stok',
-      key: 'stok_produk',
-      render: (text, record) => renderCell(text, record, 'stok')
-    },
-    {
-      title: previousState.tableColumns[9],
-      dataIndex: 'persentase',
-      key: 'persentase',
-      render: (text, record) => {
-        const formattedPercent = text ? parseFloat(text).toString() : "0";
-        return (
-          <span
-            style={{
-              backgroundColor: applyFilters(record),
-              padding: "0.5em",
-              borderRadius: "0.25em",
-            }}
-          >
-            {formattedPercent.includes('.') ? parseFloat(formattedPercent).toFixed(1) : formattedPercent}%
-          </span>
-        )
-      },
-    },
-    {
-      title: previousState.tableColumns[8],
-      dataIndex: 'selisih',
-      key: 'selisih',
-      defaultSortOrder: 'descend',
-      sorter: (a, b) => a.selisih - b.selisih,
-      render: (text, record) => (
-        <span
-          style={{
-            backgroundColor: applyFilters(record),
-            padding: "0.5em",
-            borderRadius: "0.25em",
-          }}
-        >
-          {text ? text : "0"}
-        </span>
-      ),
-    },
-  ]
-
-  const columnsWeight = [
-    {
-      title: previousState.tableColumns[0],
-      dataIndex: 'kode_produk',
-      key: 'kode_produk',
-      render: (text, record) => renderCell(text, record, 'kode_produk')
-    },
-    {
-      title: previousState.tableColumns[1],
-      dataIndex: 'sku_induk',
-      key: 'sku_induk',
-      render: (text, record) => renderCell(text, record, 'sku_induk')
-    },
-    {
-      title: previousState.tableColumns[2],
-      dataIndex: 'nama_produk',
-      key: 'nama_produk',
-      render: (text, record) => renderCell(text, record, 'nama_produk')
-    },
-    {
-      title: previousState.tableColumns[3],
-      dataIndex: 'berat',
-      key: 'berat',
-      render: (text, record) => renderCell(text, record, 'berat')
-    },
-    {
-      title: previousState.tableColumns[4],
-      dataIndex: 'panjang',
-      key: 'panjang',
-      render: (text, record) => renderCell(text, record, 'panjang')
-    },
-    {
-      title: previousState.tableColumns[5],
-      dataIndex: 'lebar',
-      key: 'lebar',
-      render: (text, record) => renderCell(text, record, 'lebar')
-    },
-    {
-      title: previousState.tableColumns[6],
-      dataIndex: 'tinggi',
-      key: 'tinggi',
-      render: (text, record) => renderCell(text, record, 'tinggi')
-    },
-    {
-      title: previousState.tableColumns[7],
-      dataIndex: 'selisih',
-      key: 'selisih',
-      defaultSortOrder: 'descend',
-      sorter: (a, b) => a.selisih - b.selisih,
-      render: (text, record) => (
-        <span
-          style={{
-            backgroundColor: applyFilters(record),
-            padding: "0.5em",
-            borderRadius: "0.25em",
-          }}
-        >
-          {text ? text : "0"}
-        </span>
-      ),
-    },
-    {
-      title: previousState.tableColumns[8],
-      dataIndex: 'persentase',
-      key: 'persentase',
-      render: (text, record) => {
-        const formattedPercent = text ? parseFloat(text).toString() : "0";
-        return (
-          <span
-            style={{
-              backgroundColor: applyFilters(record),
-              padding: "0.5em",
-              borderRadius: "0.25em",
-            }}
-          >
-            {formattedPercent.includes('.') ? parseFloat(formattedPercent).toFixed(1) : formattedPercent}%
-          </span>
-        )
-      },
-    },
-  ]
-
-  let setColumns = previousState.typeTable === 'shopee_product' ? columns : columnsWeight
+  const columns = generateColumns(previousState.tableColumns);
 
   const onChange = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
@@ -390,7 +259,7 @@ const TableResultsDetail = () => {
           type: 'checkbox',
           ...rowSelection,
         }}
-        columns={setColumns}
+        columns={columns}
         dataSource={data}
         pagination={false}
       />

@@ -60,7 +60,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
 
   return (
     <Dialog onCancel={onClose}>
-      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
+      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
         <div className='flex flex-col gap-2'>
           <span className='text-base font-bold'>Filter Warna</span>
           {sortFilter.map((filter, index) => (
@@ -85,7 +85,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               </div>
               <input
                 type='text'
-                className='flex h-full w-full items-center rounded-lg border border-solid border-blue-950 px-4 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
+                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
                 placeholder={`Pilih angka nya saja "5" %`}
                 value={filter.value}
                 onChange={(e) => {
@@ -99,7 +99,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                 type='color'
                 id='favcolor'
                 name='favcolor'
-                className='h-full w-11 rounded-lg border border-solid border-blue-950'
+                className='h-full border border-solid rounded-lg w-11 border-blue-950'
                 value={filter.color}
                 onChange={(e) => {
                   const updatedFilters = [...savedFilters]
@@ -108,10 +108,10 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                 }}
               />
               <button
-                className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-200'
+                className='flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg'
                 onClick={() => handleDeleteFilter(index, 'saved')}
               >
-                <TrashIcon className='h-5 w-5 text-red-500' />
+                <TrashIcon className='w-5 h-5 text-red-500' />
               </button>
             </div>
           ))}
@@ -133,7 +133,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               </div>
               <input
                 type='text'
-                className='flex h-full w-full items-center rounded-lg border border-solid border-blue-950 px-4 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
+                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
                 placeholder={`Pilih angka nya saja "5" %`}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
@@ -143,7 +143,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                 type='color'
                 id='favcolor'
                 name='favcolor'
-                className='h-full w-11 rounded-lg border border-solid border-blue-950'
+                className='h-full border border-solid rounded-lg w-11 border-blue-950'
                 value={color}
                 onChange={handleColorPicker}
               />
@@ -171,7 +171,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               </div>
               <input
                 type='text'
-                className='flex h-full w-full items-center rounded-lg border border-solid border-blue-950 px-4 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
+                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
                 placeholder={`Pilih angka nya saja "5" %`}
                 value={filter.value}
                 onChange={(e) => {
@@ -185,7 +185,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                 type='color'
                 id='favcolor'
                 name='favcolor'
-                className='h-full w-11 rounded-lg border border-solid border-blue-950'
+                className='h-full border border-solid rounded-lg w-11 border-blue-950'
                 value={filter.color}
                 onChange={(e) => {
                   const updatedFilters = [...filters]
@@ -196,7 +196,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
             </div>
           ))}
           <button
-            className='flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
+            className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
             onClick={handleAddFilter}
           >
             Tambah
@@ -205,13 +205,13 @@ const FilterDialog = ({ onClose, onSubmit }) => {
         <div className='flex h-12 gap-6'>
           <button
             onClick={onClose}
-            className='flex h-full w-full items-center justify-center rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
+            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
           >
             Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex h-full w-full items-center justify-center rounded-lg bg-blue-950 text-base font-bold text-white'
+            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
           >
             Konfirmasi
           </button>
