@@ -37,21 +37,12 @@ const TableResultsDetail = () => {
 
   const applyFilters = (record) => {
     for (const filter of savedFilters) {
+      const percentage = parseFloat(record.persentase);
       if (
-        filter.operator === "greater_than" &&
-        record.persentase > filter.value
+        percentage >= filter.valueStart &&
+        percentage <= filter.valueEnd
       ) {
         return filter.color;
-      } else if (
-        filter.operator === "lesser_than" &&
-        record.persentase < filter.value
-      ) {
-        return filter.color ;
-      } else if (
-        filter.operator === "equal" &&
-        record.persentase === filter.value
-      ) {
-        return filter.color ;
       }
     }
     return "transparent";

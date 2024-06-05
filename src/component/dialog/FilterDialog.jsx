@@ -1,48 +1,50 @@
 import Dialog from '../shared/Dialog'
 import React, { useState, useContext } from 'react'
-import Dropdown from '../shared/Dropdown'
 import { FormContext } from '../../context/FormContext'
-import { Operator, operators } from '../../libs/enum'
-import { Select, Space } from 'antd'
+import { InputNumber } from 'antd'
 import TrashIcon from '../icons/TrashIcon'
 
 const FilterDialog = ({ onClose, onSubmit }) => {
   const [filters, setFilters] = useState([])
   const [color, setColor] = useState('#ffffff')
-  const [typeOperator, setTypeOperator] = useState('=')
-  const [value, setValue] = useState('')
+  const [valueStart, setValueStart] = useState('')
+  const [valueEnd, setValueEnd] = useState('')
   const { savedFilters, setSavedFilters } = useContext(FormContext)
-  
-  const sortFilter = savedFilters.sort((a, b) => b.value - a.value)
+
+  const sortFilter = savedFilters.sort((a, b) => b.valueEnd - a.valueEnd)
 
   const handleColorPicker = (e) => {
     setColor(e.target.value)
   }
 
   const handleAddFilter = () => {
-    if (value !== '') {
-      const newFilter = {
-        operator: typeOperator,
-        value,
-        color,
-      };
-      setFilters([...filters, newFilter]);
-      setValue(''); 
-      setColor('#ffffff'); 
-      setTypeOperator('=');
+    const newFilter = {
+      valueStart: valueStart !== '' ? parseFloat(valueStart) : '',
+      valueEnd: valueEnd !== '' ? parseFloat(valueEnd) : '',
+      color,
     }
-  };
+
+    setFilters([...filters, newFilter])
+    setValueStart('')
+    setValueEnd('')
+    setColor('#ffffff')
+  }
 
   const handleConfirm = () => {
-    let combinedFilters = [...savedFilters, ...filters]
-    if (value !== '') {
-      const latestFilter = {
-        operator: typeOperator,
-        value,
+    let combinedFilters = [...savedFilters]
+    const validNewFilters = filters.filter((filter) => filter.valueStart !== '' && filter.valueEnd !== '')
+
+    if (valueStart !== '' && valueEnd !== '') {
+      const newFilter = {
+        valueStart: parseFloat(valueStart),
+        valueEnd: parseFloat(valueEnd),
         color,
       }
-      combinedFilters = [...combinedFilters, latestFilter]
+      validNewFilters.push(newFilter)
     }
+
+    combinedFilters = [...combinedFilters, ...validNewFilters]
+
     setSavedFilters(combinedFilters)
     onSubmit(combinedFilters)
     onClose()
@@ -65,40 +67,29 @@ const FilterDialog = ({ onClose, onSubmit }) => {
           <span className='text-base font-bold'>Filter Warna</span>
           {sortFilter.map((filter, index) => (
             <div className='flex h-8 gap-2' key={index}>
-              <div className='w-fit'>
-                <Select
-                  size='middle'
-                  showSearch
-                  style={{ width: 'fit-content', height: '100%' }}
-                  placeholder='='
-                  value={filter.operator}
-                  onChange={(newValue) => {
-                    const updatedFilters = [...savedFilters]
-                    updatedFilters[index].operator = newValue
-                    setSavedFilters(updatedFilters)
-                  }}
-                  options={Object.values(Operator).map((col) => ({
-                    label: col.label,
-                    value: col.value,
-                  }))}
-                />
-              </div>
-              <input
-                type='text'
-                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
-                placeholder={`Pilih angka nya saja "5" %`}
-                value={filter.value}
-                onChange={(e) => {
+              <InputNumber
+                placeholder='Start'
+                value={filter.valueStart}
+                onChange={(value) => {
                   const updatedFilters = [...savedFilters]
-                  updatedFilters[index].value = e.target.value
+                  updatedFilters[index].valueStart = value
                   setSavedFilters(updatedFilters)
                 }}
+                style={{ width: '50%' }}
               />
-              <label htmlFor='favcolor' className='hidden'></label>
+              <span className='flex items-center'>-</span>
+              <InputNumber
+                placeholder='End'
+                value={filter.valueEnd}
+                onChange={(value) => {
+                  const updatedFilters = [...savedFilters]
+                  updatedFilters[index].valueEnd = value
+                  setSavedFilters(updatedFilters)
+                }}
+                style={{ width: '50%' }}
+              />
               <input
                 type='color'
-                id='favcolor'
-                name='favcolor'
                 className='h-full border border-solid rounded-lg w-11 border-blue-950'
                 value={filter.color}
                 onChange={(e) => {
@@ -115,76 +106,31 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               </button>
             </div>
           ))}
-          {savedFilters.length === 0 && (
-            <div className='flex h-8 gap-2'>
-              <div className='w-fit'>
-                <Select
-                  size='middle'
-                  showSearch
-                  style={{ width: 'fit-content', height: '100%' }}
-                  placeholder='='
-                  value={typeOperator}
-                  onChange={(value) => setTypeOperator(value)}
-                  options={Object.values(Operator).map((col) => ({
-                    label: col.label,
-                    value: col.value,
-                  }))}
-                />
-              </div>
-              <input
-                type='text'
-                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
-                placeholder={`Pilih angka nya saja "5" %`}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-              />
-              <label htmlFor='favcolor' className='hidden'></label>
-              <input
-                type='color'
-                id='favcolor'
-                name='favcolor'
-                className='h-full border border-solid rounded-lg w-11 border-blue-950'
-                value={color}
-                onChange={handleColorPicker}
-              />
-            </div>
-          )}
           {filters.map((filter, index) => (
             <div className='flex h-8 gap-2' key={index}>
-              <div className='w-fit'>
-                <Select
-                  size='middle'
-                  showSearch
-                  style={{ width: 'fit-content', height: '100%' }}
-                  placeholder='='
-                  value={filter.operator}
-                  onChange={(newValue) => {
-                    const updatedFilters = [...filters]
-                    updatedFilters[index].operator = newValue
-                    setFilters(updatedFilters)
-                  }}
-                  options={Object.values(Operator).map((col) => ({
-                    label: col.label,
-                    value: col.value,
-                  }))}
-                />
-              </div>
-              <input
-                type='text'
-                className='flex items-center w-full h-full px-4 border border-solid rounded-lg border-blue-950 placeholder:text-base placeholder:font-medium placeholder:text-gray-400'
-                placeholder={`Pilih angka nya saja "5" %`}
-                value={filter.value}
-                onChange={(e) => {
+              <InputNumber
+                placeholder='Start'
+                value={filter.valueStart}
+                onChange={(value) => {
                   const updatedFilters = [...filters]
-                  updatedFilters[index].value = e.target.value
+                  updatedFilters[index].valueStart = value
                   setFilters(updatedFilters)
                 }}
+                style={{ width: '50%' }}
               />
-              <label htmlFor='favcolor' className='hidden'></label>
+              <span className='flex items-center'>-</span>
+              <InputNumber
+                placeholder='End'
+                value={filter.valueEnd}
+                onChange={(value) => {
+                  const updatedFilters = [...filters]
+                  updatedFilters[index].valueEnd = value
+                  setFilters(updatedFilters)
+                }}
+                style={{ width: '50%' }}
+              />
               <input
                 type='color'
-                id='favcolor'
-                name='favcolor'
                 className='h-full border border-solid rounded-lg w-11 border-blue-950'
                 value={filter.color}
                 onChange={(e) => {
@@ -195,6 +141,29 @@ const FilterDialog = ({ onClose, onSubmit }) => {
               />
             </div>
           ))}
+          {savedFilters.length === 0 && (
+            <div className='flex h-8 gap-2'>
+              <InputNumber
+                placeholder='Start'
+                value={valueStart}
+                onChange={(value) => setValueStart(value)}
+                style={{ width: '50%' }}
+              />
+              <span className='flex items-center'>-</span>
+              <InputNumber
+                placeholder='End'
+                value={valueEnd}
+                onChange={(value) => setValueEnd(value)}
+                style={{ width: '50%' }}
+              />
+              <input
+                type='color'
+                className='h-full border border-solid rounded-lg w-11 border-blue-950'
+                value={color}
+                onChange={handleColorPicker}
+              />
+            </div>
+          )}
           <button
             className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
             onClick={handleAddFilter}
