@@ -85,7 +85,7 @@ const TableResultsDetail = () => {
           render: (text, record) => {
             const formattedValue =
               key === 'persentase'
-                ? (text ? parseFloat(text).toFixed(1) : '0') + '%'
+                ? new Intl.NumberFormat('id-ID').format(text) + '%'
                 : text
                   ? previousState.typeColumn === 'berat'
                     ? text
@@ -96,7 +96,7 @@ const TableResultsDetail = () => {
                 style={{
                   backgroundColor: applyFilters(record),
                   padding: '0.5em',
-                  borderRadius: '0.25em',
+                  borderRadius: '99999px',
                 }}
               >
                 {formattedValue}
