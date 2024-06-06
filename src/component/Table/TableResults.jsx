@@ -1,11 +1,11 @@
-import React from "react";
-import { Flex, Table } from "antd";
-import { Link } from "react-router-dom";
+import React from 'react'
+import { Collapse, Flex, Table } from 'antd'
+import { Link } from 'react-router-dom'
 import Text from 'antd/es/typography/Text'
 
 const TableResult = ({ results, previousState, duplicate, secondaryDuplicates }) => {
-  const processedTypeColumn = previousState.typeColumn;
-  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn);
+  const processedTypeColumn = previousState.typeColumn
+  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn)
 
   const columns = [
     {
@@ -29,27 +29,25 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
       key: 'x',
       render: (text, record) => {
         // Temukan duplikat yang relevan dengan file ini
-        const relevantSecondaryDuplicates = secondaryDuplicates.filter(
-          dup => dup.filename === record.filename
-        );
+        const relevantSecondaryDuplicates = secondaryDuplicates.filter((dup) => dup.filename === record.filename)
 
         return (
-          <div className='flex justify-end w-full'>
+          <div className='flex w-full justify-end'>
             <Link
               to={`/table/${encodeURIComponent(record.filename)}`}
               state={{
                 result: record,
                 previousState: {
                   ...previousState,
-                  secondaryDuplicates: relevantSecondaryDuplicates
-                }
+                  secondaryDuplicates: relevantSecondaryDuplicates,
+                },
               }}
-              className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
+              className='rounded-lg bg-blue-950 px-2 py-1 text-sm font-semibold text-white'
             >
               Detail
             </Link>
           </div>
-        );
+        )
       },
     },
   ]
@@ -64,18 +62,16 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
   const columnsDuplicate = [
     {
       title: isDuplicateSKU ? 'SKU' : 'Kode Produk',
-      dataIndex: "value",
-      key: "value",
+      dataIndex: 'value',
+      key: 'value',
     },
     {
-      title: "Columns",
-      dataIndex: "numbers",
-      key: "numbers",
-      render: (text, record) => (
-        <span className="text-sm font-normal">{record.numbers.join(", ")}</span>
-      ),
+      title: 'Columns',
+      dataIndex: 'numbers',
+      key: 'numbers',
+      render: (text, record) => <span className='text-sm font-normal'>{record.numbers.join(', ')}</span>,
     },
-  ];
+  ]
 
   // Data untuk tabel duplikat
   const dataDuplicate = duplicate.flatMap((dup, index) =>
@@ -83,25 +79,35 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
       key: `${index}-${rowIndex}`,
       value: row.value,
       numbers: row.numbers,
-    }))
-  );
+    })),
+  )
 
-  const hasDuplicate = duplicate && duplicate.length > 0;
-  
-  return(
+  const hasDuplicate = duplicate && duplicate.length > 0
+
+  return (
     <Flex vertical gap='middle'>
       {hasDuplicate && (
-        <Flex vertical gap='middle'>
-        <Text className='text-red-600'>
-            Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang diberikan. Baris berikut
-            tidak dapat diproses.
-          </Text>
-      <Table columns={columnsDuplicate} dataSource={dataDuplicate} pagination={false}/>
+        <Flex vertical={true} gap={24} className='pb-10'>
+          <Collapse
+            items={[
+              {
+                key: 1,
+                label: (
+                  <Text className='text-red-600'>
+                    Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang
+                    diberikan
+                  </Text>
+                ),
+                children: <Table columns={columnsDuplicate} dataSource={dataDuplicate} pagination={true} />,
+              },
+            ]}
+          />
         </Flex>
-        )}
-     <Table columns={columns} dataSource={data} pagination={false} />
+      )}
+
+      <Table columns={columns} dataSource={data} pagination={false} />
     </Flex>
-     );
-};
+  )
+}
 
 export default TableResult

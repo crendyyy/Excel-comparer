@@ -38,9 +38,11 @@ const TaskSheet = ({ task, columns, isLoading }) => {
           ? record.isModified
             ? { background: '#8be78d', color: '#006644' }
             : { background: '#e5e7eb' }
-          : slug === 'sebelumnya'
-            ? { background: '#fee7e7', color: '#ad1f1f' }
-            : {}
+          : record.isDuplicated
+            ? { background: '#fed7aa', color: '#c2410c' }
+            : slug === 'sebelumnya'
+              ? { background: '#fee7e7', color: '#ad1f1f' }
+              : {}
 
       return {
         props: { style },

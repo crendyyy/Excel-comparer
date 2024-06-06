@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Button, Flex, Table } from 'antd'
+import { Button, Collapse, Flex, Table } from 'antd'
 import Text from 'antd/es/typography/Text'
 import Title from 'antd/es/typography/Title'
 import { useNavigate } from 'react-router-dom'
@@ -42,19 +42,28 @@ const TaskResult = ({ task, isLoading, onHide }) => {
 
       {hasDuplicate && (
         <Flex vertical={true} gap={24} className='pb-10'>
-          <Text className='text-red-600'>
-            Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan. Baris berikut
-            tidak dapat diproses.
-          </Text>
-
-          <Table
-            columns={[
-              { title: task.excel.primaryColumn, dataIndex: 'value', sorter: columnSorter('value') },
-              { title: 'Nomor Baris', dataIndex: 'numbers', sorter: columnSorter('numbers') },
+          <Collapse
+            items={[
+              {
+                key: 1,
+                label: (
+                  <Text className='text-red-600'>
+                    Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan.
+                  </Text>
+                ),
+                children: (
+                  <Table
+                    columns={[
+                      { title: task.excel.primaryColumn, dataIndex: 'value', sorter: columnSorter('value') },
+                      { title: 'Nomor Baris', dataIndex: 'numbers', sorter: columnSorter('numbers') },
+                    ]}
+                    dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.numbers.join(', ') }))}
+                    pagination={true}
+                  ></Table>
+                ),
+              },
             ]}
-            dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.numbers.join(', ') }))}
-            pagination={true}
-          ></Table>
+          />
         </Flex>
       )}
 
@@ -84,6 +93,12 @@ const TaskResult = ({ task, isLoading, onHide }) => {
           </Flex>
 
           <ul className='flex gap-4'>
+            <li className='flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-[#f97316]'></span>Duplikasi
+            </li>
+            <li className='flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-[#b51f3f]'></span>Nilai sebelumnya
+            </li>
             <li className='flex items-center gap-2'>
               <span className='h-2 w-2 rounded-full bg-[#8be78d]'></span>Sudah berubah
             </li>
