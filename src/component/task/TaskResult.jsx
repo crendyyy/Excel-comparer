@@ -48,7 +48,7 @@ const TaskResult = ({ task, isLoading, onHide }) => {
                 key: 1,
                 label: (
                   <Text className='text-red-600'>
-                    Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan.
+                    Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan
                   </Text>
                 ),
                 children: (

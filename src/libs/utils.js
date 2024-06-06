@@ -53,24 +53,23 @@ export const columnSorter = (columnName) => (a, b) => {
 
 export const findMatchCondition = (conditions, targetValue) => {
   if (conditions.length === 0) return {}
-
-  const sortedConditions = [...conditions].sort((a, b) => b.value - a.value)
-
+  const sortedConditions = [...conditions].sort((a, b) => b.end - a.end)
 
   const matchingCondition = sortedConditions.find((condition) => {
-    const { type, value } = condition
-    const targetNumber = Number(targetValue)
-    const conditionNumber = Number(value)
+    const { start, end } = condition
 
-    switch (type) {
-      case 'greater_than':
-        return targetNumber > conditionNumber
-      case 'lesser_than':
-        return targetNumber < conditionNumber
-      case 'equal':
-        return targetNumber === conditionNumber
-      default:
-        return false
+    if (end === '>') {
+      if (parseFloat(targetValue) >= start) {
+        return true
+      }
+    } else if (end === '<') {
+      if (parseFloat(targetValue) <= start) {
+        return true
+      }
+    } else {
+      if (parseFloat(targetValue) >= start && parseFloat(targetValue) <= end) {
+        return true
+      }
     }
   })
 

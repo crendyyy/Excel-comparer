@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Table, Checkbox, Button, Flex } from 'antd'
+import { Table, Checkbox, Button, Flex, Collapse } from 'antd'
 import Text from 'antd/es/typography/Text'
 import ArrowLeft from '../icons/ArrowLeft'
 import FilterIcon from '../icons/FilterIcon'
@@ -238,12 +238,21 @@ const TableResultsDetail = () => {
       </div>
 
       {hasSecondaryDuplicates && (
-        <Flex vertical gap='middle'>
-          <Text className='text-red-600'>
-            Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang diberikan.
-            Baris berikut tidak dapat diproses.
-          </Text>
-          <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={false} />
+        <Flex vertical={true} gap={24} className='pb-10'>
+          <Collapse
+            items={[
+              {
+                key: 1,
+                label: (
+                  <Text className='text-red-600'>
+                    Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang
+                    diberikan
+                  </Text>
+                ),
+                children: <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={true} />,
+              },
+            ]}
+          />
         </Flex>
       )}
       <Table
