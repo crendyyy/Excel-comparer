@@ -74,7 +74,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                   updatedFilters[index].valueStart = value
                   setSavedFilters(updatedFilters)
                 }}
-                style={{ width: '50%' }}
+                style={{ width: '50%', borderColor: '#110F45' }}
               />
               <span className='flex items-center'>-</span>
               <Input
@@ -85,7 +85,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                   updatedFilters[index].valueEnd = e.target.value
                   setSavedFilters(updatedFilters)
                 }}
-                style={{ width: '50%' }}
+                style={{ width: '50%', borderColor: '#110F45' }}
               />
               <input
                 type='color'
@@ -115,7 +115,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                   updatedFilters[index].valueStart = value
                   setFilters(updatedFilters)
                 }}
-                style={{ width: '50%' }}
+                style={{ width: '50%', borderColor: '#110F45' }}
               />
               <span className='flex items-center'>-</span>
               <Input
@@ -126,7 +126,7 @@ const FilterDialog = ({ onClose, onSubmit }) => {
                   updatedFilters[index].valueEnd = e.target.value
                   setFilters(updatedFilters)
                 }}
-                style={{ width: '50%' }}
+                style={{ width: '50%', borderColor: '#110F45' }}
               />
               <input
                 type='color'
