@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Table, Checkbox, Button, Flex, Collapse } from 'antd'
+import { Table, Checkbox, Button, Flex } from 'antd'
 import Text from 'antd/es/typography/Text'
 import ArrowLeft from '../icons/ArrowLeft'
 import FilterIcon from '../icons/FilterIcon'
@@ -38,8 +38,18 @@ const TableResultsDetail = () => {
   const applyFilters = (record) => {
     for (const filter of savedFilters) {
       const percentage = parseFloat(record.persentase)
-      if (percentage >= filter.valueStart && percentage <= filter.valueEnd) {
-        return filter.color
+      if (filter.valueEnd === '>') {
+        if (percentage >= filter.valueStart) {
+          return filter.color
+        }
+      } else if (filter.valueEnd === '<') {
+        if (percentage <= filter.valueStart) {
+          return filter.color
+        }
+      } else {
+        if (percentage >= filter.valueStart && percentage <= filter.valueEnd) {
+          return filter.color
+        }
       }
     }
     return 'transparent'
@@ -125,9 +135,9 @@ const TableResultsDetail = () => {
       type: previousState.typeTable,
       targetColumn: previousState.typeColumn,
       config: savedFilters.map((filter) => ({
-        type: filter.operator,
+        start: filter.valueStart,
+        end: filter.valueEnd,
         color: filter.color,
-        value: filter.value,
       })),
       rows: selectedRows.map((row) => ({
         kode_produk: row.kode_produk,
@@ -153,9 +163,9 @@ const TableResultsDetail = () => {
       type: previousState.typeTable,
       targetColumn: previousState.typeColumn,
       config: savedFilters.map((filter) => ({
-        type: filter.operator,
+        start: filter.valueStart,
+        end: filter.valueEnd,
         color: filter.color,
-        value: filter.value,
       })),
       rows: selectedRows.map((row) => ({
         kode_produk: row.kode_produk,
@@ -228,24 +238,14 @@ const TableResultsDetail = () => {
       </div>
 
       {hasSecondaryDuplicates && (
-        <Flex vertical={true} gap={24} className='pb-10'>
-          <Collapse
-            items={[
-              {
-                key: 1,
-                label: (
-                  <Text className='text-red-600'>
-                    Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang
-                    diberikan
-                  </Text>
-                ),
-                children: <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={true} />,
-              },
-            ]}
-          />
+        <Flex vertical gap='middle'>
+          <Text className='text-red-600'>
+            Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang diberikan.
+            Baris berikut tidak dapat diproses.
+          </Text>
+          <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={false} />
         </Flex>
       )}
-
       <Table
         className='custom-table-header'
         onChange={onChange}
