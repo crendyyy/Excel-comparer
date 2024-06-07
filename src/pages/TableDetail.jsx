@@ -1,15 +1,15 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import FilterIcon from "../component/icons/FilterIcon";
-import useDialog from "../hooks/useDialog";
-import FilterDialog from "../component/dialog/FilterDialog";
-import TableResult from "../component/Table/TableResults";
-import { Select } from "antd";
-import { FormContext } from "../context/FormContext";
-import { columns, operators } from "../libs/enum";
-import {useCompareExcel} from "../services/excels/useCompareExcel";
-import { useCompareSKUExcel } from "../services/excels/useGetMissingSku";
-import Title from "antd/es/typography/Title";
-import { xlsxMimeType } from "../libs/const";
+import { useContext, useEffect, useRef, useState } from 'react'
+import FilterIcon from '../component/icons/FilterIcon'
+import useDialog from '../hooks/useDialog'
+import FilterDialog from '../component/dialog/FilterDialog'
+import TableResult from '../component/Table/TableResults'
+import { Select } from 'antd'
+import { FormContext } from '../context/FormContext'
+import { columns, operators } from '../libs/enum'
+import { useCompareExcel } from '../services/excels/useCompareExcel'
+import { useCompareSKUExcel } from '../services/excels/useGetMissingSku'
+import Title from 'antd/es/typography/Title'
+import { xlsxMimeType } from '../libs/const'
 
 const TableDetail = () => {
   const {
@@ -28,6 +28,8 @@ const TableDetail = () => {
     setSecondaryFileNames,
     tableColumns,
     setTableColumns,
+    excelColumns,
+    setExcelColumns,
     filteredResults,
     setFilteredResults,
     isSubmited,
@@ -39,7 +41,7 @@ const TableDetail = () => {
     setResultsDuplicate,
     resultsDuplicatesSecond,
     setResultsDuplicatesSecond,
-  } = useContext(FormContext);
+  } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
@@ -100,7 +102,7 @@ const TableDetail = () => {
             : 'File Turunan'
       setSecondaryFileNames(truncatedNames)
     }
-    setResultsDuplicatesSecond([]); 
+    setResultsDuplicatesSecond([])
   }
 
   const handleSubmit = async (e) => {
@@ -115,28 +117,32 @@ const TableDetail = () => {
 
     const response = await mutation.mutateAsync({ data: data })
 
-      const result = response.data
-      console.log(result);
-      if (!result || !result.payload) {
-        throw new Error("Invalid response structure");
-      }
+    const result = response.data
+    console.log(result)
+    if (!result || !result.payload) {
+      throw new Error('Invalid response structure')
+    }
 
-      const allDuplicates = result.payload.duplicated;
-      const mainFileDuplicates = allDuplicates.filter(dup => dup.filename === formData.mainFile.name);
-      const secondaryFilesDuplicates = allDuplicates.filter(dup => formData.secondaryFiles.some(file => file.name === dup.filename));
-      const tableColumns = result.payload.columns
+    const allDuplicates = result.payload.duplicated
+    const mainFileDuplicates = allDuplicates.filter((dup) => dup.filename === formData.mainFile.name)
+    const secondaryFilesDuplicates = allDuplicates.filter((dup) =>
+      formData.secondaryFiles.some((file) => file.name === dup.filename),
+    )
+    const tableColumns = result.payload.columns
+    const primaryColumn = result.payload.excel
 
     const filteredData =
       typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
 
-      setFilteredResults(filteredData);
-      setResultsDuplicate(mainFileDuplicates)
-      setResultsDuplicatesSecond(secondaryFilesDuplicates)
-      setTableColumns(tableColumns)
-      setIsSubmited(true);
-      console.log(tableColumns);
-      console.log("Filtered Results:", filteredData);
-  };
+    setFilteredResults(filteredData)
+    setResultsDuplicate(mainFileDuplicates)
+    setExcelColumns(primaryColumn)
+    setResultsDuplicatesSecond(secondaryFilesDuplicates)
+    setTableColumns(tableColumns)
+    setIsSubmited(true)
+    console.log(tableColumns)
+    console.log('Filtered Results:', filteredData)
+  }
 
   const filterResults = (results, operator) => {
     return results.map((fileResult) => {
@@ -157,41 +163,38 @@ const TableDetail = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-10">
-    <Title level={2}>Daftar Tugas</Title>
-      <form
-        onSubmit={handleSubmit}
-        className="flex justify-between w-full p-6 bg-white rounded-lg"
-      >
-        <div className="flex gap-6">
+    <div className='flex flex-col gap-8 p-10'>
+      <Title level={2}>Daftar Tugas</Title>
+      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
+        <div className='flex gap-6'>
           <label
             htmlFor='main-file'
-            className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
           >
             {mainFileName}
           </label>
           <input
-            name="main-file"
-            type="file"
-            id="main-file"
+            name='main-file'
+            type='file'
+            id='main-file'
             accept={xlsxMimeType}
-            className="hidden"
+            className='hidden'
             onChange={handleFileChange}
             required
             ref={mainFileRef}
           />
           <label
             htmlFor='compares-file'
-            className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
           >
             {secondaryFileNames}
           </label>
           <input
-            name="compares-file"
-            type="file"
-            id="compares-file"
+            name='compares-file'
+            type='file'
+            id='compares-file'
             accept={xlsxMimeType}
-            className="hidden"
+            className='hidden'
             multiple
             onChange={handleFileChange}
             required
@@ -244,18 +247,19 @@ const TableDetail = () => {
       </form>
       {isSubmited && (
         <TableResult
-        results={filteredResults}
-        duplicate={resultsDuplicate}
-        secondaryDuplicates={resultsDuplicatesSecond} 
-        previousState={{
-          typeTable,
-          typeColumn,
-          typeOperator,
-          filterCriteria,
-          resultsDuplicatesSecond,
-          tableColumns, 
-        }}
-      />
+          results={filteredResults}
+          duplicate={resultsDuplicate}
+          secondaryDuplicates={resultsDuplicatesSecond}
+          excelColumns={excelColumns}
+          previousState={{
+            typeTable,
+            typeColumn,
+            typeOperator,
+            filterCriteria,
+            resultsDuplicatesSecond,
+            tableColumns,
+          }}
+        />
       )}
       {isDialogOpen && (
         <FilterDialog

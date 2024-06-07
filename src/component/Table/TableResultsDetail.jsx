@@ -23,7 +23,7 @@ const TableResultsDetail = () => {
 
   const processedTypeColumn = previousState.typeColumn
 
-  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn)
+  const stripXlsxExtension = (name) => name.replace(/\.xlsx$/, '')
 
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
     setSelectedRowKeys(newSelectedRowKeys)
@@ -104,7 +104,6 @@ const TableResultsDetail = () => {
             )
           },
           sorter: key === 'selisih' ? (a, b) => a.selisih - b.selisih : undefined,
-          defaultSortOrder: key === 'selisih' ? 'descend' : undefined,
         }
       } else {
         return {
@@ -119,10 +118,6 @@ const TableResultsDetail = () => {
 
   const columns = generateColumns(previousState.tableColumns)
 
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra)
-  }
-
   const data =
     result?.rows.map((row, index) => ({
       key: index,
@@ -131,7 +126,7 @@ const TableResultsDetail = () => {
 
   const handleSaveTask = async () => {
     const taskData = {
-      name: filename,
+      name: stripXlsxExtension(filename),
       type: previousState.typeTable,
       targetColumn: previousState.typeColumn,
       config: savedFilters.map((filter) => ({
@@ -159,7 +154,7 @@ const TableResultsDetail = () => {
 
   const handleSaveTaskWeight = async () => {
     const taskData = {
-      name: filename,
+      name: stripXlsxExtension(filename),
       type: previousState.typeTable,
       targetColumn: previousState.typeColumn,
       config: savedFilters.map((filter) => ({
@@ -187,7 +182,7 @@ const TableResultsDetail = () => {
 
   const columnsDuplicate = [
     {
-      title: isDuplicateSKU ? 'SKU' : 'Kode Produk',
+      title: previousState.excelColumns,
       dataIndex: 'value',
       key: 'value',
     },
@@ -198,6 +193,8 @@ const TableResultsDetail = () => {
       render: (text, record) => <span className='text-sm font-normal'>{record.numbers.join(', ')}</span>,
     },
   ]
+
+  const fileDuplicate = previousState.secondaryDuplicates.map((dup) => dup.filename)
 
   const dataDuplicateSecondary =
     previousState.secondaryDuplicates?.flatMap((dup, index) =>
@@ -245,8 +242,8 @@ const TableResultsDetail = () => {
                 key: 1,
                 label: (
                   <Text className='text-red-600'>
-                    Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang
-                    diberikan
+                    Duplikasi <strong>{previousState.excelColumns}</strong> terdeteksi pada file{' '}
+                    <strong>{fileDuplicate}</strong> yang diberikan
                   </Text>
                 ),
                 children: <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={true} />,
@@ -257,7 +254,6 @@ const TableResultsDetail = () => {
       )}
       <Table
         className='custom-table-header'
-        onChange={onChange}
         rowSelection={{
           type: 'checkbox',
           ...rowSelection,

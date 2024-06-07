@@ -3,9 +3,8 @@ import { Collapse, Flex, Table } from 'antd'
 import { Link } from 'react-router-dom'
 import Text from 'antd/es/typography/Text'
 
-const TableResult = ({ results, previousState, duplicate, secondaryDuplicates }) => {
-  const processedTypeColumn = previousState.typeColumn
-  const isDuplicateSKU = ['stok', 'harga', 'sku_produk'].includes(processedTypeColumn)
+const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, excelColumns }) => {
+  const targetColumn = excelColumns.primaryColumn === 'sku_produk' ? 'SKU' : 'Kode Produk'
 
   const columns = [
     {
@@ -40,6 +39,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
                 previousState: {
                   ...previousState,
                   secondaryDuplicates: relevantSecondaryDuplicates,
+                  excelColumns: targetColumn,
                 },
               }}
               className='rounded-lg bg-blue-950 px-2 py-1 text-sm font-semibold text-white'
@@ -61,7 +61,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
 
   const columnsDuplicate = [
     {
-      title: isDuplicateSKU ? 'SKU' : 'Kode Produk',
+      title: targetColumn,
       dataIndex: 'value',
       key: 'value',
     },
@@ -84,6 +84,8 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
 
   const hasDuplicate = duplicate && duplicate.length > 0
 
+  const fileDuplicate = duplicate.map((dup) => dup.filename)
+
   return (
     <Flex vertical gap='middle'>
       {hasDuplicate && (
@@ -94,7 +96,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates })
                 key: 1,
                 label: (
                   <Text className='text-red-600'>
-                    Duplikasi <strong>{isDuplicateSKU ? 'SKU' : 'Kode Produk'}</strong> terdeteksi pada file yang
+                    Duplikasi <strong>{targetColumn}</strong> terdeteksi pada file <strong>{fileDuplicate}</strong> yang
                     diberikan
                   </Text>
                 ),
