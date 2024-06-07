@@ -55,7 +55,14 @@ const TaskDetail = () => {
 
   return (
     <Flex vertical={true} gap={32} style={{ padding: 40 }}>
-      {showResult && <TaskResult task={result} isLoading={isPending} onHide={() => setShowResult(false)} />}
+      {showResult && (
+        <TaskResult
+          task={result}
+          filename={uploadedFile?.name}
+          isLoading={isPending}
+          onHide={() => setShowResult(false)}
+        />
+      )}
 
       <Flex className={showResult ? 'hidden' : ''} vertical={true} gap={24}>
         <Flex justify='space-between'>

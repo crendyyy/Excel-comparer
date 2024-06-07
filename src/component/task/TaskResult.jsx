@@ -3,12 +3,12 @@ import { Button, Collapse, Flex, Table } from 'antd'
 import Text from 'antd/es/typography/Text'
 import Title from 'antd/es/typography/Title'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import TaskSheet from './TaskSheet'
 import useUpdateTask from '../../services/tasks/useUpdateTask'
 import { columnSorter } from '../../libs/utils'
 
-const TaskResult = ({ task, isLoading, onHide }) => {
+const TaskResult = ({ task, filename, isLoading, onHide }) => {
   const navigate = useNavigate()
   const updateTaskMutation = useUpdateTask()
 
@@ -48,7 +48,8 @@ const TaskResult = ({ task, isLoading, onHide }) => {
                 key: 1,
                 label: (
                   <Text className='text-red-600'>
-                    Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file yang diberikan
+                    Duplikasi <strong>{task.excel.primaryColumn}</strong> terdeteksi pada file{' '}
+                    <strong>{filename}</strong>
                   </Text>
                 ),
                 children: (
@@ -72,19 +73,20 @@ const TaskResult = ({ task, isLoading, onHide }) => {
           <Flex gap={16}>
             <ul className='flex flex-wrap gap-4'>
               {task.config.map((item) => {
-                const operator =
-                  item.type === 'greater_than'
-                    ? '>'
-                    : item.type === 'lesser_than'
-                      ? '<'
-                      : item.type === 'equal'
-                        ? '='
-                        : ''
-
                 return (
                   <li key={item.id} className='flex items-center gap-2'>
                     <span className='rounded-full px-3 py-1' style={{ backgroundColor: item.color }}>
-                      {operator} {new Intl.NumberFormat('id-ID').format(item.value)}%
+                      {item.end === '>' ? (
+                        `> ${item.start}%`
+                      ) : item.end === '<' ? (
+                        `${item.end}% <`
+                      ) : (
+                        <div className='flex items-center gap-2'>
+                          {item.start}%
+                          <ArrowRightOutlined />
+                          {item.end}%
+                        </div>
+                      )}
                     </span>
                   </li>
                 )
@@ -139,6 +141,7 @@ const TaskResult = ({ task, isLoading, onHide }) => {
 
 TaskResult.propTypes = {
   task: PropTypes.object,
+  filename: PropTypes.string,
   onHide: PropTypes.func,
   isLoading: PropTypes.bool,
 }
