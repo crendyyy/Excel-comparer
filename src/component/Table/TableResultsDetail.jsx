@@ -148,8 +148,7 @@ const TableResultsDetail = () => {
       })),
     }
     navigate('/tugas')
-    const response = await saveTaskMutation.mutateAsync({ data: taskData })
-    console.log('Task saved successfully:', response.data)
+    saveTaskMutation.mutateAsync({ data: taskData })
   }
 
   const handleSaveTaskWeight = async () => {
@@ -175,8 +174,7 @@ const TableResultsDetail = () => {
       })),
     }
     navigate('/tugas')
-    const response = await saveTaskMutation.mutateAsync({ data: taskData })
-    console.log('Task saved successfully:', response.data)
+    saveTaskMutation.mutateAsync({ data: taskData })
   }
   let saveTask = previousState.typeTable === 'shopee_product' ? handleSaveTask : handleSaveTaskWeight
 
@@ -218,7 +216,6 @@ const TableResultsDetail = () => {
           onSubmit={(filters) => {
             setFilterCriteria(filters)
             closeDialog()
-            console.log('Filter Criteria:', filters)
           }}
         />
       )}

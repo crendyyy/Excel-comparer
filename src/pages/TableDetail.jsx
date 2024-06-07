@@ -118,7 +118,6 @@ const TableDetail = () => {
     const response = await mutation.mutateAsync({ data: data })
 
     const result = response.data
-    console.log(result)
     if (!result || !result.payload) {
       throw new Error('Invalid response structure')
     }
@@ -140,8 +139,6 @@ const TableDetail = () => {
     setResultsDuplicatesSecond(secondaryFilesDuplicates)
     setTableColumns(tableColumns)
     setIsSubmited(true)
-    console.log(tableColumns)
-    console.log('Filtered Results:', filteredData)
   }
 
   const filterResults = (results, operator) => {
@@ -267,7 +264,6 @@ const TableDetail = () => {
           onSubmit={(filters) => {
             setFilterCriteria(filters)
             closeDialog()
-            console.log('Filter Criteria:', filters)
           }}
         />
       )}
