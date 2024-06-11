@@ -11,7 +11,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
 
   const [filters, setFilters] = useState({
     name: { value: '', regex: true },
-    type: { value: '' },
+    type: { value: '', parent: 'excel' },
     status: { value: '' },
   })
 

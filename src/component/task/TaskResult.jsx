@@ -58,7 +58,7 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
                       { title: task.excel.primaryColumn, dataIndex: 'value', sorter: columnSorter('value') },
                       { title: 'Nomor Baris', dataIndex: 'numbers', sorter: columnSorter('numbers') },
                     ]}
-                    dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.numbers.join(', ') }))}
+                    dataSource={task.duplicated.map((item) => ({ ...item, numbers: item.rowNumbers.join(', ') }))}
                     pagination={true}
                   ></Table>
                 ),
@@ -112,7 +112,11 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
 
         <TaskSheet
           isLoading={isLoading}
-          columns={[...task.columns.slice(0, -2), 'Sebelumnya', 'Persentase']}
+          columns={[
+            ...task.excel.columns.slice(0, -2),
+            { label: 'Sebelumnya', key: 'sebelumnya' },
+            { label: 'Persentase', key: 'persentase' },
+          ]}
           task={task}
         />
 

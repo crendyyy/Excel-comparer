@@ -87,7 +87,9 @@ const TaskDetail = () => {
           </Flex>
         </Flex>
 
-        {!showResult && <TaskSheet task={task?.payload || {}} columns={task?.payload.columns} isLoading={isPending} />}
+        {!showResult && (
+          <TaskSheet task={task?.payload || {}} columns={task?.payload.excel.columns || []} isLoading={isPending} />
+        )}
       </Flex>
     </Flex>
   )

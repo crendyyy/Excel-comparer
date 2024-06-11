@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import FilterIcon from '../component/icons/FilterIcon'
 import useDialog from '../hooks/useDialog'
 import FilterDialog from '../component/dialog/FilterDialog'
@@ -145,7 +145,7 @@ const TableDetail = () => {
     return results.map((fileResult) => {
       const filteredRows = fileResult.rows.filter((row) => {
         switch (operator) {
-          case 'less_than':
+          case 'lesser_than':
             return row.selisih < 0
           case 'greater_than':
             return row.selisih > 0

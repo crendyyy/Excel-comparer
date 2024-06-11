@@ -10,7 +10,7 @@ export const useCompareExcel = () => {
   return useMutation({
     mutationFn: ({ data }) => {
       toast.loading('Memproses data...')
-      return axiosClient._post(`/v1/excel/compare`, data)
+      return axiosClient._post(`/v1/excels/compare`, data)
     },
 
     onSuccess: () => {

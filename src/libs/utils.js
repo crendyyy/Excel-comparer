@@ -26,6 +26,9 @@ export const filterResponse = (response = [], criteria = {}) => {
         return regex.test(item[key])
       }
 
+      if (filter.parent && item[filter.parent]) {
+        return item[filter.parent][key] === filter.value
+      }
       return item[key] === filter.value
     }),
   )

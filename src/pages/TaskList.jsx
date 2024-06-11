@@ -8,7 +8,8 @@ import { toast } from 'react-toastify'
 
 const TaskList = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs(new Date()))
-  const formattedDate = selectedDate?.format('YYYY-MM-DD')
+  const formattedDate = selectedDate.format('YYYY-MM-DD')
+
   const { data: tasks, isPending, isError } = useGetAllTask({ startDate: formattedDate })
 
   useEffect(() => {
