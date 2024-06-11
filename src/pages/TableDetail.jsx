@@ -5,11 +5,13 @@ import FilterDialog from '../component/dialog/FilterDialog'
 import TableResult from '../component/Table/TableResults'
 import { Select } from 'antd'
 import { FormContext } from '../context/FormContext'
-import { columns, operators } from '../libs/enum'
+import { columns, operators, ExcelType } from '../libs/enum'
 import { useCompareExcel } from '../services/excels/useCompareExcel'
 import { useCompareSKUExcel } from '../services/excels/useGetMissingSku'
 import Title from 'antd/es/typography/Title'
 import { xlsxMimeType } from '../libs/const'
+import InputMainFileDialog from '../component/dialog/InputMainFile'
+import InputSecondaryFileDialog from '../component/dialog/InputSecondaryFiles'
 
 const TableDetail = () => {
   const {
@@ -50,12 +52,8 @@ const TableDetail = () => {
   const submitExcelMutation = useCompareExcel()
   const submitMissingMutation = useCompareSKUExcel()
 
-  const types = [
-    { id: 0, tableType: 'Pilih E-comm' },
-    { id: 'shopee_product', tableType: 'shopee' },
-    { id: 'tiktok_product', tableType: 'tiktok' },
-    { id: 'tokopedia_product', tableType: 'tokopedia' },
-  ]
+  const [dialogContent, setDialogContent] = useState(null)
+
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -159,45 +157,108 @@ const TableDetail = () => {
     })
   }
 
+  const inputMainFileDialog = () => {
+    return <InputMainFileDialog onClose={closeDialog} />
+  }
+  const inputSecondaryFileDialog = () => {
+    return <InputSecondaryFileDialog onClose={closeDialog} />
+  }
+
+  const filterDialog = () => {
+    return (
+      <FilterDialog
+        onClose={closeDialog}
+        onSubmit={(filters) => {
+          setFilterCriteria(filters)
+          closeDialog()
+        }}
+      />
+    )
+  }
+
+  const openDialogWithContent = (content) => {
+    setDialogContent(content)
+    openDialog()
+  }
+
   return (
     <div className='flex flex-col gap-8 p-10'>
       <Title level={2}>Daftar Tugas</Title>
-      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
+      <form onSubmit={handleSubmit} className='flex justify-between w-full p-6 bg-white rounded-lg'>
         <div className='flex gap-6'>
-          <label
-            htmlFor='main-file'
-            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
-          >
-            {mainFileName}
-          </label>
-          <input
-            name='main-file'
-            type='file'
-            id='main-file'
-            accept={xlsxMimeType}
-            className='hidden'
-            onChange={handleFileChange}
-            required
-            ref={mainFileRef}
-          />
-          <label
-            htmlFor='compares-file'
-            className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
-          >
-            {secondaryFileNames}
-          </label>
-          <input
-            name='compares-file'
-            type='file'
-            id='compares-file'
-            accept={xlsxMimeType}
-            className='hidden'
-            multiple
-            onChange={handleFileChange}
-            required
-            ref={secondaryFilesRef}
-          />
-          <div className='w-40'>
+          <div className='w-fit'>
+            <Select
+              allowClear
+              size='large'
+              showSearch
+              style={{ width: '100%', height: '100%' }}
+              placeholder='Pilih E-comm'
+              value={typeTable}
+              onChange={(value) => setTypeTable(value)}
+              options={Object.values(ExcelType).map((col) => ({
+                label: col.label,
+                value: col.value,
+              }))}
+            />
+          </div>
+          {typeTable === 'shopee_product' ? (
+            <button
+              type='button'
+              onClick={() => openDialogWithContent(inputMainFileDialog)}
+              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+            >
+              File Utama
+            </button>
+          ) : (
+            <>
+              <label
+                htmlFor='main-file'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+              >
+                {mainFileName}
+              </label>
+              <input
+                name='main-file'
+                type='file'
+                id='main-file'
+                accept={xlsxMimeType}
+                className='hidden'
+                onChange={handleFileChange}
+                required
+                ref={mainFileRef}
+              />
+            </>
+          )}
+         {typeTable === 'shopee_product' ? (
+            <button
+              type='button'
+              onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
+              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+            >
+              File Turunan
+            </button>
+          ) : (
+            <>
+              <label
+                htmlFor='compare-file'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+              >
+                {secondaryFileNames}
+              </label>
+              <input
+                name='compare-file'
+                type='file'
+                id='compare-file'
+                accept={xlsxMimeType}
+                className='hidden'
+                onChange={handleFileChange}
+                required
+                multiple
+                ref={mainFileRef}
+              />
+            </>
+          )}
+          <div className='w-fit'>
             <Select
               allowClear
               size='large'
@@ -213,7 +274,7 @@ const TableDetail = () => {
             />
           </div>
           {!hideOperator && (
-            <div className='w-40'>
+            <div className='w-fit'>
               <Select
                 allowClear
                 size='large'
@@ -231,7 +292,11 @@ const TableDetail = () => {
           )}
         </div>
         <div className='flex gap-4'>
-          <button type='button' onClick={openDialog} className='flex h-full items-center rounded-lg bg-[#110F45] px-4'>
+          <button
+            type='button'
+            onClick={() => openDialogWithContent(filterDialog)}
+            className='flex h-full items-center rounded-lg bg-[#110F45] px-4'
+          >
             <FilterIcon />
           </button>
           <button
@@ -258,15 +323,7 @@ const TableDetail = () => {
           }}
         />
       )}
-      {isDialogOpen && (
-        <FilterDialog
-          onClose={closeDialog}
-          onSubmit={(filters) => {
-            setFilterCriteria(filters)
-            closeDialog()
-          }}
-        />
-      )}
+      {isDialogOpen && dialogContent}
     </div>
   )
 }

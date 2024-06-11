@@ -13,6 +13,7 @@ export const FormProvider = ({ children }) => {
   const [typeOperator, setTypeOperator] = useState('Pilih Operator')
   const [typeTable, setTypeTable] = useState('shopee_product')
   const [mainFileName, setMainFileName] = useState('File Utama')
+  const [mainFileDiscount, setMainFileDiscount] = useState('Harga Coret')
   const [secondaryFileNames, setSecondaryFileNames] = useState('File Turunan')
   const [filteredResults, setFilteredResults] = useState([])
   const [resultsDuplicate, setResultsDuplicate] = useState([])
@@ -21,6 +22,7 @@ export const FormProvider = ({ children }) => {
   const [excelColumns, setExcelColumns] = useState([])
   const [filterCriteria, setFilterCriteria] = useState([])
   const [savedFilters, setSavedFilters] = useState([])
+  const [savedInputs, setSavedInputs] = useState([]);
   const [isSubmited, setIsSubmited] = useState(false)
   const [hideOperator, setHideOperator] = useState(false)
 
@@ -37,6 +39,8 @@ export const FormProvider = ({ children }) => {
         setTypeTable,
         mainFileName,
         setMainFileName,
+        mainFileDiscount,
+        setMainFileDiscount,
         secondaryFileNames,
         setSecondaryFileNames,
         filteredResults,
@@ -57,6 +61,8 @@ export const FormProvider = ({ children }) => {
         setFilterCriteria,
         savedFilters,
         setSavedFilters,
+        savedInputs,
+        setSavedInputs,
       }}
     >
       {children}
