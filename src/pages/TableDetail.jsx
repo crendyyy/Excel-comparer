@@ -43,6 +43,8 @@ const TableDetail = () => {
     setResultsDuplicate,
     resultsDuplicatesSecond,
     setResultsDuplicatesSecond,
+    savedInputsMain,
+    savedInputsSecondary,
   } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
@@ -125,7 +127,7 @@ const TableDetail = () => {
     const secondaryFilesDuplicates = allDuplicates.filter((dup) =>
       formData.secondaryFiles.some((file) => file.name === dup.filename),
     )
-    const tableColumns = result.payload.columns
+    const tableColumns = result.payload.excel.columns
     const primaryColumn = result.payload.excel
 
     const filteredData =
@@ -207,7 +209,7 @@ const TableDetail = () => {
               onClick={() => openDialogWithContent(inputMainFileDialog)}
               className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
             >
-              File Utama
+              {savedInputsMain.length === 0 ? 'File Utama' : `1 Toko Utama`}
             </button>
           ) : (
             <>
@@ -235,7 +237,7 @@ const TableDetail = () => {
               onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
               className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
             >
-              File Turunan
+              {savedInputsSecondary.length === 0 ? 'File Turunan' : `${savedInputsSecondary.length} Toko Cabang`}
             </button>
           ) : (
             <>

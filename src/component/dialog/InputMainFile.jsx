@@ -2,11 +2,20 @@ import Dialog from '../shared/Dialog'
 import React, { useState, useContext, useRef, useEffect } from 'react'
 import { FormContext } from '../../context/FormContext'
 import { xlsxMimeType } from '../../libs/const'
+import useFindActualPrice from '../../services/excels/useFindActualPrice'
 
 const InputMainFileDialog = ({ onClose }) => {
-  const { setFormData, mainFileName, setMainFileName, mainFileDiscount, setMainFileDiscount } = useContext(FormContext)
+  const {
+    setFormData,
+    mainFilePrice,
+    setMainFilePrice,
+    mainFileDiscount,
+    setMainFileDiscount,
+    savedInputsMain,
+    setSavedInputsMain,
+  } = useContext(FormContext)
 
-  const [tempMainFileName, setTempMainFileName] = useState(mainFileName)
+  const [tempMainFileName, setTempMainFileName] = useState(mainFilePrice)
   const [tempMainFileDiscount, setTempMainFileDiscount] = useState(mainFileDiscount)
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
@@ -14,10 +23,12 @@ const InputMainFileDialog = ({ onClose }) => {
   const mainFilePriceRef = useRef(null)
   const mainFileDiscountRef = useRef(null)
 
+  const submitCombinedFiles = useFindActualPrice()
+
   useEffect(() => {
-    setTempMainFileName(mainFileName)
+    setTempMainFileName(mainFilePrice)
     setTempMainFileDiscount(mainFileDiscount)
-  }, [mainFileName, mainFileDiscount])
+  }, [mainFilePrice, mainFileDiscount])
 
   const truncateFileName = (name, maxLength = 40) =>
     name.length > maxLength ? `${name.substring(0, maxLength)}...` : name
@@ -35,17 +46,32 @@ const InputMainFileDialog = ({ onClose }) => {
     }
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async (e) => {
     if (tempMainFilePrice || tempMainFileDiscountFile) {
+      const formData = new FormData()
+      formData.append('mainFile', tempMainFilePrice)
+      formData.append('discountFile', tempMainFileDiscountFile)
+
       setFormData((prev) => ({ ...prev, mainFilePrice: tempMainFilePrice, mainFileDiscount: tempMainFileDiscountFile }))
-      setMainFileName(tempMainFileName)
+      setMainFilePrice(tempMainFileName)
       setMainFileDiscount(tempMainFileDiscount)
+      
+      const response = await submitCombinedFiles.mutateAsync({ data: formData })
+      
+      const result = response.data
+      if (!result || !result.payload) {
+        throw new Error('Invalid response structure')
+      }
+      
+      const combinedFiles = result.payload
+      console.log(combinedFiles);
+      setSavedInputsMain(combinedFiles)
     }
     onClose()
   }
 
   const handleCancel = () => {
-    if (!mainFileName && !mainFileDiscount) {
+    if (!mainFilePrice && !mainFileDiscount) {
       setTempMainFileName('Harga Mati')
       setTempMainFileDiscount('Harga Coret')
       setTempMainFilePrice(null)
@@ -53,6 +79,7 @@ const InputMainFileDialog = ({ onClose }) => {
     }
     onClose()
   }
+  console.log(savedInputsMain)
 
   return (
     <Dialog onCancel={handleCancel}>

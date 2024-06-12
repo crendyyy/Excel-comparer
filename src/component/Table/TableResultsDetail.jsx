@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Table, Checkbox, Button, Flex, Collapse } from 'antd'
-import Text from 'antd/es/typography/Text'
+import { Table, Button, Collapse, Typography } from 'antd'
 import ArrowLeft from '../icons/ArrowLeft'
 import FilterIcon from '../icons/FilterIcon'
 import FilterDialog from '../dialog/FilterDialog'
 import { FormContext } from '../../context/FormContext'
 import useCreateTask from '../../services/tasks/useCreateTask'
 import useDialog from '../../hooks/useDialog'
+
+const { Text } = Typography
 
 const TableResultsDetail = () => {
   const { filename } = useParams()
@@ -76,10 +77,10 @@ const TableResultsDetail = () => {
 
   const generateColumns = (tableColumns) => {
     return tableColumns.map((col) => {
-      const key = col.toLowerCase().replace(' ', '_')
+      const key = col.key
       if (key === 'persentase' || key === 'selisih') {
         return {
-          title: col,
+          title: col.label,
           dataIndex: key,
           key: key,
           render: (text, record) => {
@@ -107,7 +108,7 @@ const TableResultsDetail = () => {
         }
       } else {
         return {
-          title: col,
+          title: col.label,
           dataIndex: key,
           key: key,
           render: (text, record) => renderCell(text, record, key),
@@ -221,7 +222,7 @@ const TableResultsDetail = () => {
       )}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
+          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
@@ -232,22 +233,20 @@ const TableResultsDetail = () => {
       </div>
 
       {hasSecondaryDuplicates && (
-        <Flex vertical={true} gap={24} className='pb-10'>
-          <Collapse
-            items={[
-              {
-                key: 1,
-                label: (
-                  <Text className='text-red-600'>
-                    Duplikasi <strong>{previousState.excelColumns}</strong> terdeteksi pada file{' '}
-                    <strong>{fileDuplicate}</strong> yang diberikan
-                  </Text>
-                ),
-                children: <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={true} />,
-              },
-            ]}
-          />
-        </Flex>
+        <Collapse
+          items={[
+            {
+              key: 1,
+              label: (
+                <Text className='text-red-600'>
+                  Duplikasi <strong>{previousState.excelColumns}</strong> terdeteksi pada file{' '}
+                  <strong>{fileDuplicate}</strong> yang diberikan
+                </Text>
+              ),
+              children: <Table columns={columnsDuplicate} dataSource={dataDuplicateSecondary} pagination={true} />,
+            },
+          ]}
+        />
       )}
       <Table
         className='custom-table-header'
@@ -259,8 +258,8 @@ const TableResultsDetail = () => {
         dataSource={data}
         pagination={true}
       />
-      <div className='flex w-full justify-end'>
-        <Button className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white' onClick={saveTask}>
+      <div className='flex justify-end w-full'>
+        <Button className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950' onClick={saveTask}>
           Simpan Tugas
         </Button>
       </div>
