@@ -110,7 +110,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     <Dialog onCancel={handleCancel}>
       <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
         <div className='flex flex-col gap-4'>
-          <span className='text-base font-bold'>File Utama</span>
+          <span className='text-base font-bold'>File Turunan</span>
           <div className='flex flex-col gap-4'>
             <label
               htmlFor='main-file-price'

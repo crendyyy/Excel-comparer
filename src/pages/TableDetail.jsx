@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import FilterIcon from '../component/icons/FilterIcon'
 import useDialog from '../hooks/useDialog'
 import FilterDialog from '../component/dialog/FilterDialog'
@@ -240,21 +240,21 @@ const TableDetail = () => {
           ) : (
             <>
               <label
-                htmlFor='compare-file'
+                htmlFor='compares-file'
                 className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {secondaryFileNames}
               </label>
               <input
-                name='compare-file'
+                name='compares-file'
                 type='file'
-                id='compare-file'
+                id='compares-file'
                 accept={xlsxMimeType}
                 className='hidden'
                 onChange={handleFileChange}
                 required
                 multiple
-                ref={mainFileRef}
+                ref={secondaryFilesRef}
               />
             </>
           )}
