@@ -16,6 +16,8 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     setSecondaryFileDiscount,
     savedInputsSecondary,
     setSavedInputsSecondary,
+    savedResultsSecondary,
+    setSavedResultsSecondary,
   } = useContext(FormContext)
 
   const [tempMainFileName, setTempMainFileName] = useState('Harga Mati')
@@ -32,11 +34,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   const submitCombinedFiles = useFindActualPrice()
 
   useEffect(() => {
-    if (savedInputsSecondary.length > 0) {
-      setIsMainFilesSaved(false)
-    } else {
-      setIsMainFilesSaved(true)
-    }
+    setIsMainFilesSaved(savedInputsSecondary.length === 0)
   }, [savedInputsSecondary])
 
   const truncateFileName = (name, maxLength = 40) =>
@@ -87,42 +85,62 @@ const InputSecondaryFileDialog = ({ onClose }) => {
         : []),
       ...validInputs,
     ]
-
-    if (combinedFiles.length > 0) {
-      const newSavedInputs = []
-
-      for (const filePair of combinedFiles) {
-        const formInputSecondaryData = new FormData()
-        formInputSecondaryData.append('mainFile', filePair.price || formInputSecondary.mainFile)
-        formInputSecondaryData.append('discountFile', filePair.discount || formInputSecondary.discountFile)
-
-        try {
-          const response = await submitCombinedFiles.mutateAsync({ data: formInputSecondaryData })
-          const result = response.data
-          if (!result || !result.payload) {
-            throw new Error('Invalid response structure')
-          }
-          const combinedFilesResponse = result.payload
-          console.log(combinedFilesResponse)
-          newSavedInputs.push(combinedFilesResponse)
-        } catch (error) {
-          console.error('Error during file submission:', error)
-        }
-      }
-
-      setSavedInputsSecondary((prev) => [...prev, ...newSavedInputs])
-
-      if (tempMainFilePrice) setSecondaryFilePrice(tempMainFileName)
-      if (tempMainFileDiscountFile) setSecondaryFileDiscount(tempMainFileDiscount)
+  
+    let isModified = false
+    const newSavedInputs = [...savedInputsSecondary]
+  
+    // Periksa apakah ada perubahan dalam input yang akan disimpan
+    if (editIndex !== null && combinedFiles.length > 0) {
+      // Edit existing input
+      newSavedInputs[editIndex] = combinedFiles[0]
+      isModified = true
+    } else if (combinedFiles.length > 0) {
+      // Add new inputs
+      newSavedInputs.push(...combinedFiles)
+      isModified = true
     }
-
-    setAdditionalInputs([])
-    setTempMainFilePrice(null)
-    setTempMainFileDiscountFile(null)
-    setEditIndex(null)
-
-    onClose()
+  
+    // Submit all inputs if modified
+    if (isModified) {
+      const dataResults = []
+      for (const input of newSavedInputs) {
+        const formInputSecondaryData = new FormData()
+        formInputSecondaryData.append('mainFile', input.price || formInputSecondary.mainFile)
+        formInputSecondaryData.append('discountFile', input.discount || formInputSecondary.discountFile)
+  
+        setFormInputSecondary({
+          mainFile: input.price || formInputSecondary.mainFile,
+          discountFile: input.discount || formInputSecondary.discountFile,
+        })
+  
+        const response = await submitCombinedFiles.mutateAsync({ data: formInputSecondaryData })
+        const result = response.data
+        if (!result || !result.payload) {
+          throw new Error('Invalid response structure')
+        }
+        const combinedResult = result.payload
+        dataResults.push(combinedResult)
+      }
+  
+      // Update states with new results
+      setSecondaryFilePrice(tempMainFileName)
+      setSecondaryFileDiscount(tempMainFileDiscount)
+      setSavedInputsSecondary(newSavedInputs)
+      setSavedResultsSecondary(dataResults)
+      setIsMainFilesSaved(false)
+  
+      // Clear input fields and reset states
+      setAdditionalInputs([])
+      setTempMainFilePrice(null)
+      setTempMainFileDiscountFile(null)
+      setEditIndex(null)
+      onClose()
+    } else {
+      onClose()
+    }
   }
+  
+  
 
   const handleCancel = () => {
     setTempMainFileName(secondaryFilePrice || 'Harga Mati')
@@ -131,7 +149,6 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     setTempMainFileDiscountFile(null)
     setAdditionalInputs([])
     setEditIndex(null)
-
     onClose()
   }
 
@@ -152,29 +169,56 @@ const InputSecondaryFileDialog = ({ onClose }) => {
       setEditIndex(index)
     }
   }
+  
 
-  const handleDeleteInput = (index) => {
+  const handleDeleteInput = async (index) => {
     const newSavedInputs = savedInputsSecondary.filter((_, i) => i !== index)
     setSavedInputsSecondary(newSavedInputs)
     setEditIndex(null)
+    setAdditionalInputs([])
     setTempMainFileName('Harga Mati')
     setTempMainFileDiscount('Harga Coret')
+    
+    // Periksa apakah ada input yang tersisa
     if (newSavedInputs.length === 0) {
       setIsMainFilesSaved(false)
+      setSavedResultsSecondary([])  // Kosongkan hasil jika tidak ada input tersisa
+    } else {
+      // Submit ulang semua file yang tersisa
+      const dataResults = []
+      for (const input of newSavedInputs) {
+        const formInputSecondaryData = new FormData()
+        formInputSecondaryData.append('mainFile', input.price || formInputSecondary.mainFile)
+        formInputSecondaryData.append('discountFile', input.discount || formInputSecondary.discountFile)
+  
+        setFormInputSecondary({
+          mainFile: input.price || formInputSecondary.mainFile,
+          discountFile: input.discount || formInputSecondary.discountFile,
+        })
+  
+        const response = await submitCombinedFiles.mutateAsync({ data: formInputSecondaryData })
+        const result = response.data
+        if (!result || !result.payload) {
+          throw new Error('Invalid response structure')
+        }
+        const combinedResult = result.payload
+        dataResults.push(combinedResult)
+      }
+      setSavedResultsSecondary(dataResults)  // Update dengan hasil baru
     }
   }
-  console.log(savedInputsSecondary)
+  
 
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
+      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           {isMainFilesSaved && (
             <div className='flex flex-col gap-4'>
               <label
                 htmlFor='main-file-price'
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {tempMainFileName}
               </label>
@@ -190,7 +234,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               />
               <label
                 htmlFor='main-file-discount'
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {tempMainFileDiscount}
               </label>
@@ -210,22 +254,22 @@ const InputSecondaryFileDialog = ({ onClose }) => {
             <div className='flex gap-4' key={index}>
               <label
                 htmlFor='results-file'
-                className='flex w-full gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex w-full gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {`Cabang ${index + 1}`}
               </label>
               <div className='flex gap-2'>
                 <button
-                  className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-200'
+                  className='flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg'
                   onClick={() => handleEditInput(index)}
                 >
-                  <PencilIcon className='h-5 w-5 text-red-500' />
+                  <PencilIcon className='w-5 h-5 text-red-500' />
                 </button>
                 <button
-                  className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-200'
+                  className='flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg'
                   onClick={() => handleDeleteInput(index)}
                 >
-                  <TrashIcon className='h-5 w-5 text-red-500' />
+                  <TrashIcon className='w-5 h-5 text-red-500' />
                 </button>
               </div>
             </div>
@@ -234,7 +278,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
             <div className='flex flex-col gap-4' key={index}>
               <label
                 htmlFor={`additional-file-price-${index}`}
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {input.priceName}
               </label>
@@ -245,11 +289,10 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 accept={xlsxMimeType}
                 className='hidden'
                 onChange={(e) => handleFileChange(e, index)}
-                required
               />
               <label
                 htmlFor={`additional-file-discount-${index}`}
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {input.discountName}
               </label>
@@ -260,29 +303,30 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 accept={xlsxMimeType}
                 className='hidden'
                 onChange={(e) => handleFileChange(e, index)}
-                required
               />
             </div>
           ))}
-          <button
-            onClick={handleAddInput}
-            className='flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
-          >
-            + Tambah File Cabang
-          </button>
+          {editIndex === null && (
+            <button
+              className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+              onClick={handleAddInput}
+            >
+              Tambah
+            </button>
+          )}
         </div>
-        <div className='flex gap-2'>
+        <div className='flex h-12 gap-6'>
           <button
             onClick={handleCancel}
-            className='flex w-full items-center justify-center rounded-lg border border-solid border-gray-200 bg-white px-4 py-3 text-base font-semibold text-gray-600'
+            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
           >
-            Batal
+            Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex w-full items-center justify-center rounded-lg border border-solid border-gray-200 bg-gray-600 px-4 py-3 text-base font-semibold text-white'
+            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
           >
-            Simpan
+            Konfirmasi
           </button>
         </div>
       </div>

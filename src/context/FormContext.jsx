@@ -29,6 +29,7 @@ export const FormProvider = ({ children }) => {
   const [savedFilters, setSavedFilters] = useState([])
   const [savedInputsMain, setSavedInputsMain] = useState([])
   const [savedInputsSecondary, setSavedInputsSecondary] = useState([])
+  const [savedResultsSecondary, setSavedResultsSecondary] = useState([])
   const [isSubmited, setIsSubmited] = useState(false)
   const [hideOperator, setHideOperator] = useState(false)
 
@@ -81,6 +82,8 @@ export const FormProvider = ({ children }) => {
         setSavedInputsMain,
         savedInputsSecondary,
         setSavedInputsSecondary,
+        savedResultsSecondary,
+        setSavedResultsSecondary,
       }}
     >
       {children}
