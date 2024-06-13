@@ -1,37 +1,43 @@
-//InputSecondaryFiles.jsx
 import Dialog from '../shared/Dialog'
 import React, { useState, useContext, useRef, useEffect } from 'react'
 import { FormContext } from '../../context/FormContext'
 import { xlsxMimeType } from '../../libs/const'
 import PencilIcon from '../icons/Edit'
 import TrashIcon from '../icons/TrashIcon'
+import useFindActualPrice from '../../services/excels/useFindActualPrice'
 
 const InputSecondaryFileDialog = ({ onClose }) => {
   const {
-    setFormData,
-    mainFileName,
-    setMainFileName,
-    mainFileDiscount,
-    setMainFileDiscount,
+    formInputSecondary,
+    setFormInputSecondary,
+    secondaryFilePrice,
+    setSecondaryFilePrice,
+    secondaryFileDiscount,
+    setSecondaryFileDiscount,
     savedInputsSecondary,
     setSavedInputsSecondary,
   } = useContext(FormContext)
 
-  const [tempMainFileName, setTempMainFileName] = useState(mainFileName)
-  const [tempMainFileDiscount, setTempMainFileDiscount] = useState(mainFileDiscount)
+  const [tempMainFileName, setTempMainFileName] = useState('Harga Mati')
+  const [tempMainFileDiscount, setTempMainFileDiscount] = useState('Harga Coret')
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
   const [additionalInputs, setAdditionalInputs] = useState([])
-  const [isMainFilesSaved, setIsMainFilesSaved] = useState(false)
+  const [isMainFilesSaved, setIsMainFilesSaved] = useState(true)
   const [editIndex, setEditIndex] = useState(null)
 
   const mainFilePriceRef = useRef(null)
   const mainFileDiscountRef = useRef(null)
 
+  const submitCombinedFiles = useFindActualPrice()
+
   useEffect(() => {
-    setTempMainFileName(mainFileName)
-    setTempMainFileDiscount(mainFileDiscount)
-  }, [mainFileName, mainFileDiscount])
+    if (savedInputsSecondary.length > 0) {
+      setIsMainFilesSaved(false)
+    } else {
+      setIsMainFilesSaved(true)
+    }
+  }, [savedInputsSecondary])
 
   const truncateFileName = (name, maxLength = 40) =>
     name.length > maxLength ? `${name.substring(0, maxLength)}...` : name
@@ -66,7 +72,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     ])
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const validInputs = additionalInputs.filter((input) => input.price !== null && input.discount !== null)
     const combinedFiles = [
       ...(tempMainFilePrice && tempMainFileDiscountFile
@@ -83,20 +89,33 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     ]
 
     if (combinedFiles.length > 0) {
-      setFormData((prev) => ({ ...prev, files: combinedFiles }))
-      if (tempMainFilePrice) setMainFileName(tempMainFileName)
-      if (tempMainFileDiscountFile) setMainFileDiscount(tempMainFileDiscount)
+      const newSavedInputs = []
 
-      if (editIndex !== null) {
-        const newSavedInputs = [...savedInputsSecondary]
-        newSavedInputs[editIndex] = combinedFiles[0]
-        setSavedInputsSecondary(newSavedInputs)
-      } else {
-        setSavedInputsSecondary((prev) => [...prev, ...combinedFiles])
+      for (const filePair of combinedFiles) {
+        const formInputSecondaryData = new FormData()
+        formInputSecondaryData.append('mainFile', filePair.price || formInputSecondary.mainFile)
+        formInputSecondaryData.append('discountFile', filePair.discount || formInputSecondary.discountFile)
+
+        try {
+          const response = await submitCombinedFiles.mutateAsync({ data: formInputSecondaryData })
+          const result = response.data
+          if (!result || !result.payload) {
+            throw new Error('Invalid response structure')
+          }
+          const combinedFilesResponse = result.payload
+          console.log(combinedFilesResponse)
+          newSavedInputs.push(combinedFilesResponse)
+        } catch (error) {
+          console.error('Error during file submission:', error)
+        }
       }
 
-      setIsMainFilesSaved(true)
+      setSavedInputsSecondary((prev) => [...prev, ...newSavedInputs])
+
+      if (tempMainFilePrice) setSecondaryFilePrice(tempMainFileName)
+      if (tempMainFileDiscountFile) setSecondaryFileDiscount(tempMainFileDiscount)
     }
+
     setAdditionalInputs([])
     setTempMainFilePrice(null)
     setTempMainFileDiscountFile(null)
@@ -106,8 +125,8 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   }
 
   const handleCancel = () => {
-    setTempMainFileName(mainFileName || 'Harga Mati')
-    setTempMainFileDiscount(mainFileDiscount || 'Harga Coret')
+    setTempMainFileName(secondaryFilePrice || 'Harga Mati')
+    setTempMainFileDiscount(secondaryFileDiscount || 'Harga Coret')
     setTempMainFilePrice(null)
     setTempMainFileDiscountFile(null)
     setAdditionalInputs([])
@@ -117,37 +136,45 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   }
 
   const handleEditInput = (index) => {
-    const inputToEdit = savedInputsSecondary[index]
-    setAdditionalInputs([
-      {
-        price: inputToEdit.price,
-        priceName: inputToEdit.priceName,
-        discount: inputToEdit.discount,
-        discountName: inputToEdit.discountName,
-      },
-    ])
-    setEditIndex(index)
+    if (editIndex === index) {
+      setEditIndex(null)
+      setAdditionalInputs([])
+    } else {
+      const inputToEdit = savedInputsSecondary[index]
+      setAdditionalInputs([
+        {
+          price: inputToEdit.price,
+          priceName: inputToEdit.priceName,
+          discount: inputToEdit.discount,
+          discountName: inputToEdit.discountName,
+        },
+      ])
+      setEditIndex(index)
+    }
   }
 
   const handleDeleteInput = (index) => {
     const newSavedInputs = savedInputsSecondary.filter((_, i) => i !== index)
     setSavedInputsSecondary(newSavedInputs)
+    setEditIndex(null)
+    setTempMainFileName('Harga Mati')
+    setTempMainFileDiscount('Harga Coret')
     if (newSavedInputs.length === 0) {
       setIsMainFilesSaved(false)
     }
   }
-  console.log(savedInputsSecondary);
+  console.log(savedInputsSecondary)
 
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
+      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           {isMainFilesSaved && (
             <div className='flex flex-col gap-4'>
               <label
                 htmlFor='main-file-price'
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
               >
                 {tempMainFileName}
               </label>
@@ -163,7 +190,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               />
               <label
                 htmlFor='main-file-discount'
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
               >
                 {tempMainFileDiscount}
               </label>
@@ -183,22 +210,22 @@ const InputSecondaryFileDialog = ({ onClose }) => {
             <div className='flex gap-4' key={index}>
               <label
                 htmlFor='results-file'
-                className='flex w-full gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+                className='flex w-full gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
               >
                 {`Cabang ${index + 1}`}
               </label>
               <div className='flex gap-2'>
                 <button
-                  className='flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg'
+                  className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-200'
                   onClick={() => handleEditInput(index)}
                 >
-                  <PencilIcon className='w-5 h-5 text-red-500' />
+                  <PencilIcon className='h-5 w-5 text-red-500' />
                 </button>
                 <button
-                  className='flex items-center justify-center w-12 h-full border border-gray-200 border-solid rounded-lg'
+                  className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-200'
                   onClick={() => handleDeleteInput(index)}
                 >
-                  <TrashIcon className='w-5 h-5 text-red-500' />
+                  <TrashIcon className='h-5 w-5 text-red-500' />
                 </button>
               </div>
             </div>
@@ -207,7 +234,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
             <div className='flex flex-col gap-4' key={index}>
               <label
                 htmlFor={`additional-file-price-${index}`}
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
               >
                 {input.priceName}
               </label>
@@ -218,10 +245,11 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 accept={xlsxMimeType}
                 className='hidden'
                 onChange={(e) => handleFileChange(e, index)}
+                required
               />
               <label
                 htmlFor={`additional-file-discount-${index}`}
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
               >
                 {input.discountName}
               </label>
@@ -232,28 +260,29 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 accept={xlsxMimeType}
                 className='hidden'
                 onChange={(e) => handleFileChange(e, index)}
+                required
               />
             </div>
           ))}
           <button
-            className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
             onClick={handleAddInput}
+            className='flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
           >
-            Tambah
+            + Tambah File Cabang
           </button>
         </div>
-        <div className='flex h-12 gap-6'>
+        <div className='flex gap-2'>
           <button
             onClick={handleCancel}
-            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+            className='flex w-full items-center justify-center rounded-lg border border-solid border-gray-200 bg-white px-4 py-3 text-base font-semibold text-gray-600'
           >
-            Batalkan
+            Batal
           </button>
           <button
             onClick={handleConfirm}
-            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
+            className='flex w-full items-center justify-center rounded-lg border border-solid border-gray-200 bg-gray-600 px-4 py-3 text-base font-semibold text-white'
           >
-            Konfirmasi
+            Simpan
           </button>
         </div>
       </div>

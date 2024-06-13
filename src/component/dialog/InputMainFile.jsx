@@ -6,7 +6,8 @@ import useFindActualPrice from '../../services/excels/useFindActualPrice'
 
 const InputMainFileDialog = ({ onClose }) => {
   const {
-    setFormData,
+    formInputMain,
+    setFormInputMain,
     mainFilePrice,
     setMainFilePrice,
     mainFileDiscount,
@@ -47,29 +48,33 @@ const InputMainFileDialog = ({ onClose }) => {
   }
 
   const handleConfirm = async (e) => {
+    e.preventDefault()
     if (tempMainFilePrice || tempMainFileDiscountFile) {
-      const formData = new FormData()
-      formData.append('mainFile', tempMainFilePrice)
-      formData.append('discountFile', tempMainFileDiscountFile)
+      const formInputMainData = new FormData()
+      formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)
+      formInputMainData.append('discountFile', tempMainFileDiscountFile || formInputMain.discountFile)
 
-      setFormData((prev) => ({ ...prev, mainFilePrice: tempMainFilePrice, mainFileDiscount: tempMainFileDiscountFile }))
+      setFormInputMain({
+        mainFile: tempMainFilePrice || formInputMain.mainFile,
+        discountFile: tempMainFileDiscountFile || formInputMain.discountFile,
+      })
       setMainFilePrice(tempMainFileName)
       setMainFileDiscount(tempMainFileDiscount)
-      
-      const response = await submitCombinedFiles.mutateAsync({ data: formData })
-      
+
+      const response = await submitCombinedFiles.mutateAsync({ data: formInputMainData })
+
       const result = response.data
       if (!result || !result.payload) {
         throw new Error('Invalid response structure')
       }
-      
+
       const combinedFiles = result.payload
-      console.log(combinedFiles);
-      setSavedInputsMain(combinedFiles)
+      console.log(combinedFiles)
+      console.log(formInputMainData)
+      setSavedInputsMain(formInputMainData)
     }
     onClose()
   }
-
   const handleCancel = () => {
     if (!mainFilePrice && !mainFileDiscount) {
       setTempMainFileName('Harga Mati')
@@ -80,16 +85,17 @@ const InputMainFileDialog = ({ onClose }) => {
     onClose()
   }
   console.log(savedInputsMain)
+  console.log(formInputMain)
 
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
+      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           <div className='flex flex-col gap-4'>
             <label
               htmlFor='main-file-price'
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
             >
               {tempMainFileName}
             </label>
@@ -105,7 +111,7 @@ const InputMainFileDialog = ({ onClose }) => {
             />
             <label
               htmlFor='main-file-discount'
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
+              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
             >
               {tempMainFileDiscount}
             </label>
@@ -124,13 +130,13 @@ const InputMainFileDialog = ({ onClose }) => {
         <div className='flex h-12 gap-6'>
           <button
             onClick={handleCancel}
-            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
           >
             Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg bg-blue-950 text-base font-bold text-white'
           >
             Konfirmasi
           </button>

@@ -9,12 +9,16 @@ export const FormProvider = ({ children }) => {
     type: '',
     targetColumn: '',
   })
+  const [formInputMain, setFormInputMain] = useState({})
+  const [formInputSecondary, setFormInputSecondary] = useState({})
   const [typeColumn, setTypeColumn] = useState('Pilih Kolum')
   const [typeOperator, setTypeOperator] = useState('Pilih Operator')
   const [typeTable, setTypeTable] = useState('shopee_product')
   const [mainFileName, setMainFileName] = useState('File Utama')
   const [mainFilePrice, setMainFilePrice] = useState('Harga Mati')
   const [mainFileDiscount, setMainFileDiscount] = useState('Harga Coret')
+  const [secondaryFilePrice, setSecondaryFilePrice] = useState('Harga Mati')
+  const [secondaryFileDiscount, setSecondaryFileDiscount] = useState('Harga Coret')
   const [secondaryFileNames, setSecondaryFileNames] = useState('File Turunan')
   const [filteredResults, setFilteredResults] = useState([])
   const [resultsDuplicate, setResultsDuplicate] = useState([])
@@ -23,8 +27,8 @@ export const FormProvider = ({ children }) => {
   const [excelColumns, setExcelColumns] = useState([])
   const [filterCriteria, setFilterCriteria] = useState([])
   const [savedFilters, setSavedFilters] = useState([])
-  const [savedInputsMain, setSavedInputsMain] = useState([]);
-  const [savedInputsSecondary, setSavedInputsSecondary] = useState([]);
+  const [savedInputsMain, setSavedInputsMain] = useState([])
+  const [savedInputsSecondary, setSavedInputsSecondary] = useState([])
   const [isSubmited, setIsSubmited] = useState(false)
   const [hideOperator, setHideOperator] = useState(false)
 
@@ -33,6 +37,10 @@ export const FormProvider = ({ children }) => {
       value={{
         formData,
         setFormData,
+        formInputMain,
+        setFormInputMain,
+        formInputSecondary,
+        setFormInputSecondary,
         typeColumn,
         setTypeColumn,
         typeOperator,
@@ -45,6 +53,10 @@ export const FormProvider = ({ children }) => {
         setMainFilePrice,
         mainFileDiscount,
         setMainFileDiscount,
+        secondaryFilePrice,
+        setSecondaryFilePrice,
+        secondaryFileDiscount,
+        setSecondaryFileDiscount,
         secondaryFileNames,
         setSecondaryFileNames,
         filteredResults,
