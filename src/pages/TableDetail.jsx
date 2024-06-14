@@ -25,6 +25,7 @@ const TableDetail = () => {
     setTypeTable,
     mainFileName,
     filterCriteria,
+    setFilterCriteria,
     setMainFileName,
     secondaryFileNames,
     setSecondaryFileNames,
@@ -38,7 +39,6 @@ const TableDetail = () => {
     setIsSubmited,
     hideOperator,
     setHideOperator,
-    setFilterCriteria,
     resultsDuplicate,
     setResultsDuplicate,
     resultsDuplicatesSecond,
@@ -59,6 +59,24 @@ const TableDetail = () => {
   const submitMissingMutation = useCompareSKUExcel()
 
   const [dialogContent, setDialogContent] = useState(null)
+  const prevTypeTableRef = useRef(typeTable)
+
+  useEffect(() => {
+    if (typeTable !== prevTypeTableRef.current) {
+      setFormData({
+        mainFile: typeTable === 'shopee_product' ? savedInputsMain : null,
+        secondaryFiles: [],
+        type: typeTable,
+        targetColumn: typeColumn,
+      })
+      prevTypeTableRef.current = typeTable
+      setSavedInputsMain([])
+      setSavedInputsSecondary([])
+      setSavedResultsSecondary([])
+      setMainFileName("File Utama")
+      setSecondaryFileNames("File Turunan")
+    }
+  }, [typeTable, savedInputsMain, setFormData, typeColumn])
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -68,7 +86,7 @@ const TableDetail = () => {
     }))
     setHideOperator(!['harga', 'stok', 'berat'].includes(typeColumn))
     if (hideOperator) setTypeOperator('Pilih Operator')
-  }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator])
+  }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator, typeTable])
 
   useEffect(() => {
     if (mainFileRef.current && formData.mainFile) {
@@ -106,19 +124,6 @@ const TableDetail = () => {
     }
   }, [typeTable, savedInputsMain, savedResultsSecondary, setFormData])
 
-  useEffect(() => {
-    setFormData({
-      mainFile: typeTable === 'shopee_product' ? savedInputsMain : null,
-      secondaryFiles: [],
-      type: typeTable,
-      targetColumn: '',
-    })
-    console.log(savedInputsMain)
-    setSavedInputsMain([])
-    setSavedInputsSecondary([])
-    setSavedResultsSecondary([])
-  }, [typeTable])
-
   const createFileList = (files) => {
     const dataTransfer = new DataTransfer()
     files.forEach((file) => dataTransfer.items.add(file))
@@ -132,7 +137,7 @@ const TableDetail = () => {
     const { name, files } = e.target
     if (typeTable === 'shopee_product') {
       if (name === 'main-file') {
-        setFormData((prev) => ({ ...prev, mainFile: savedInputsMain })) // Menggunakan savedInputsMain
+        setFormData((prev) => ({ ...prev, mainFile: savedInputsMain }))
         setMainFileName(truncateFileName(files[0].name))
       } else if (name === 'compares-file') {
         const fileObjects = Array.from(files).map((file) => ({
@@ -158,32 +163,38 @@ const TableDetail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const data = new FormData()
-
+  
+    let data
+  
     if (typeTable === 'shopee_product') {
-      data.append('mainFile', JSON.stringify(formData.mainFile)) // Simpan mainFile sebagai JSON string
-      formData.secondaryFiles.forEach((file) => {
-        data.append('secondaryFiles', JSON.stringify(file)) // Simpan setiap secondaryFile sebagai JSON string
-      })
+      data = {
+        mainFile: formData.mainFile,
+        secondaryFiles: formData.secondaryFiles,
+        type: formData.type,
+        targetColumn: formData.targetColumn,
+      }
     } else {
+      data = new FormData()
       data.append('mainFile', formData.mainFile)
       formData.secondaryFiles.forEach((file) => {
         data.append('secondaryFiles', file)
       })
+      data.append('type', formData.type)
+      data.append('targetColumn', formData.targetColumn)
     }
-
-    data.append('type', formData.type)
-    data.append('targetColumn', formData.targetColumn)
-
+    console.log(data);
+  
     const mutation = typeColumn === 'sku_produk' ? submitMissingMutation : submitExcelMutation
-
-    const response = await mutation.mutateAsync({ data: data })
-
+  
+    const response = typeTable === 'shopee_product'
+      ? await mutation.mutateAsync({ data: JSON.stringify(data) })
+      : await mutation.mutateAsync({ data: data })
+  
     const result = response.data
     if (!result || !result.payload) {
       throw new Error('Invalid response structure')
     }
-
+  
     const allDuplicates = result.payload.duplicated
     const mainFileDuplicates = allDuplicates.filter((dup) => dup.filename === formData.mainFile.filename)
     const secondaryFilesDuplicates = allDuplicates.filter((dup) =>
@@ -191,10 +202,10 @@ const TableDetail = () => {
     )
     const tableColumns = result.payload.excel.columns
     const primaryColumn = result.payload.excel
-
+  
     const filteredData =
       typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
-
+  
     setFilteredResults(filteredData)
     setResultsDuplicate(mainFileDuplicates)
     setExcelColumns(primaryColumn)
@@ -252,7 +263,7 @@ const TableDetail = () => {
   return (
     <div className='flex flex-col gap-8 p-10'>
       <Title level={2}>Daftar Tugas</Title>
-      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
+      <form onSubmit={handleSubmit} className='flex justify-between w-full p-6 bg-white rounded-lg'>
         <div className='flex gap-6'>
           <div className='w-fit'>
             <Select
@@ -273,7 +284,7 @@ const TableDetail = () => {
             <button
               type='button'
               onClick={() => openDialogWithContent(inputMainFileDialog)}
-              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
             >
               {savedInputsMain.length === 0 ? 'File Utama' : `1 Toko Utama`}
             </button>
@@ -281,7 +292,7 @@ const TableDetail = () => {
             <>
               <label
                 htmlFor='main-file'
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {mainFileName}
               </label>
@@ -301,7 +312,7 @@ const TableDetail = () => {
             <button
               type='button'
               onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
-              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
             >
               {savedInputsSecondary.length === 0 ? 'File Turunan' : `${savedInputsSecondary.length} Toko Cabang`}
             </button>
@@ -309,7 +320,7 @@ const TableDetail = () => {
             <>
               <label
                 htmlFor='compares-file'
-                className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
               >
                 {secondaryFileNames}
               </label>

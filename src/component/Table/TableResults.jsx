@@ -31,7 +31,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
         const relevantSecondaryDuplicates = secondaryDuplicates.filter((dup) => dup.filename === record.filename)
 
         return (
-          <div className='flex w-full justify-end'>
+          <div className='flex justify-end w-full'>
             <Link
               to={`/table/${encodeURIComponent(record.filename)}`}
               state={{
@@ -42,7 +42,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
                   excelColumns: targetColumn,
                 },
               }}
-              className='rounded-lg bg-blue-950 px-2 py-1 text-sm font-semibold text-white'
+              className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
             >
               Detail
             </Link>
@@ -67,9 +67,9 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
     },
     {
       title: 'Columns',
-      dataIndex: 'numbers',
-      key: 'numbers',
-      render: (text, record) => <span className='text-sm font-normal'>{record.numbers.join(', ')}</span>,
+      dataIndex: 'rowNumbers',
+      key: 'rowNumbers',
+      render: (text, record) => <span className='text-sm font-normal'>{record.rowNumbers.join(', ')}</span>,
     },
   ]
 
@@ -78,7 +78,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
     dup.rows.map((row, rowIndex) => ({
       key: `${index}-${rowIndex}`,
       value: row.value,
-      numbers: row.numbers,
+      rowNumbers: row.rowNumbers,
     })),
   )
 

@@ -187,9 +187,9 @@ const TableResultsDetail = () => {
     },
     {
       title: 'Columns',
-      dataIndex: 'numbers',
-      key: 'numbers',
-      render: (text, record) => <span className='text-sm font-normal'>{record.numbers.join(', ')}</span>,
+      dataIndex: 'rowNumbers',
+      key: 'rowNumbers',
+      render: (text, record) => <span className='text-sm font-normal'>{record.rowNumbers.join(', ')}</span>,
     },
   ]
 
@@ -200,7 +200,7 @@ const TableResultsDetail = () => {
       dup.rows.map((row, rowIndex) => ({
         key: `${index}-${rowIndex}`,
         value: row.value,
-        numbers: row.numbers,
+        rowNumbers: row.rowNumbers,
       })),
     ) || []
 
