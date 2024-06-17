@@ -13,7 +13,7 @@ export const FormProvider = ({ children }) => {
   const [formInputSecondary, setFormInputSecondary] = useState({})
   const [typeColumn, setTypeColumn] = useState('Pilih Kolum')
   const [typeOperator, setTypeOperator] = useState('Pilih Operator')
-  const [typeTable, setTypeTable] = useState('shopee_product')
+  const [typeTable, setTypeTable] = useState('Pilih E-comm')
   const [mainFileName, setMainFileName] = useState('File Utama')
   const [mainFilePrice, setMainFilePrice] = useState('Harga Mati')
   const [mainFileDiscount, setMainFileDiscount] = useState('Harga Coret')

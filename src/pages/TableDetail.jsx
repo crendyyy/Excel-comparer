@@ -280,6 +280,21 @@ const TableDetail = () => {
               }))}
             />
           </div>
+          <div className='w-fit'>
+            <Select
+              allowClear
+              size='large'
+              showSearch
+              style={{ width: '100%', height: '100%' }}
+              placeholder='Pilih Column'
+              value={typeColumn}
+              onChange={(value) => setTypeColumn(value)}
+              options={Object.values(columns).map((col) => ({
+                label: col.label,
+                value: col.value,
+              }))}
+            />
+          </div>
           {typeTable === 'shopee_product' ? (
             <button
               type='button'
@@ -337,21 +352,6 @@ const TableDetail = () => {
               />
             </>
           )}
-          <div className='w-fit'>
-            <Select
-              allowClear
-              size='large'
-              showSearch
-              style={{ width: '100%', height: '100%' }}
-              placeholder='Pilih Column'
-              value={typeColumn}
-              onChange={(value) => setTypeColumn(value)}
-              options={Object.values(columns).map((col) => ({
-                label: col.label,
-                value: col.value,
-              }))}
-            />
-          </div>
           {!hideOperator && (
             <div className='w-fit'>
               <Select
