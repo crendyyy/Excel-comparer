@@ -16,8 +16,8 @@ const InputMainFileDialog = ({ onClose }) => {
     setSavedInputsMain,
   } = useContext(FormContext)
 
-  const [tempMainFileName, setTempMainFileName] = useState('Harga Mati')
-  const [tempMainFileDiscount, setTempMainFileDiscount] = useState('Harga Coret')
+  const [tempMainFileName, setTempMainFileName] = useState(mainFilePrice)
+  const [tempMainFileDiscount, setTempMainFileDiscount] = useState(mainFileDiscount)
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
 

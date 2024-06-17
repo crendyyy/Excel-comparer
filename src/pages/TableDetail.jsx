@@ -51,6 +51,8 @@ const TableDetail = () => {
     setSavedResultsSecondary,
   } = useContext(FormContext)
 
+  const [originalResults, setOriginalResults] = useState([])
+
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
   const secondaryFilesRef = useRef(null)
@@ -60,6 +62,13 @@ const TableDetail = () => {
 
   const [dialogContent, setDialogContent] = useState(null)
   const prevTypeTableRef = useRef(typeTable)
+
+  useEffect(() => {
+    if (originalResults.length > 0) {
+      const filteredData = filterResults(originalResults, typeOperator)
+      setFilteredResults(filteredData)
+    }
+  }, [typeOperator, originalResults])
 
   useEffect(() => {
     if (typeTable !== prevTypeTableRef.current) {
@@ -73,8 +82,8 @@ const TableDetail = () => {
       setSavedInputsMain([])
       setSavedInputsSecondary([])
       setSavedResultsSecondary([])
-      setMainFileName("File Utama")
-      setSecondaryFileNames("File Turunan")
+      setMainFileName('File Utama')
+      setSecondaryFileNames('File Turunan')
     }
   }, [typeTable, savedInputsMain, setFormData, typeColumn])
 
@@ -84,9 +93,17 @@ const TableDetail = () => {
       targetColumn: typeColumn,
       type: typeTable,
     }))
-    setHideOperator(!['harga', 'stok', 'berat'].includes(typeColumn))
-    if (hideOperator) setTypeOperator('Pilih Operator')
-  }, [typeColumn, hideOperator, setFormData, setHideOperator, setTypeOperator, typeTable])
+  }, [typeColumn, typeTable, setFormData])
+
+  useEffect(() => {
+    if (filteredResults && filteredResults.length > 0) {
+      const shouldHideOperator = !['harga', 'stok', 'berat'].includes(typeColumn)
+      setHideOperator(shouldHideOperator)
+      if (shouldHideOperator) {
+        setTypeOperator('Pilih Operator')
+      }
+    }
+  }, [filteredResults, typeColumn, setHideOperator, setTypeOperator])
 
   useEffect(() => {
     if (mainFileRef.current && formData.mainFile) {
@@ -163,9 +180,9 @@ const TableDetail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-  
+
     let data
-  
+
     if (typeTable === 'shopee_product') {
       data = {
         mainFile: formData.mainFile,
@@ -182,19 +199,19 @@ const TableDetail = () => {
       data.append('type', formData.type)
       data.append('targetColumn', formData.targetColumn)
     }
-    console.log(data);
-  
+
     const mutation = typeColumn === 'sku_produk' ? submitMissingMutation : submitExcelMutation
-  
-    const response = typeTable === 'shopee_product'
-      ? await mutation.mutateAsync({ data: JSON.stringify(data) })
-      : await mutation.mutateAsync({ data: data })
-  
+
+    const response =
+      typeTable === 'shopee_product'
+        ? await mutation.mutateAsync({ data: JSON.stringify(data) })
+        : await mutation.mutateAsync({ data })
+
     const result = response.data
     if (!result || !result.payload) {
       throw new Error('Invalid response structure')
     }
-  
+
     const allDuplicates = result.payload.duplicated
     const mainFileDuplicates = allDuplicates.filter((dup) => dup.filename === formData.mainFile.filename)
     const secondaryFilesDuplicates = allDuplicates.filter((dup) =>
@@ -202,10 +219,10 @@ const TableDetail = () => {
     )
     const tableColumns = result.payload.excel.columns
     const primaryColumn = result.payload.excel
-  
-    const filteredData =
-      typeColumn === 'sku_produk' ? result.payload.results : filterResults(result.payload.results, typeOperator)
-  
+
+    setOriginalResults(result.payload.results) // Simpan hasil asli
+    const filteredData = filterResults(result.payload.results, typeOperator)
+
     setFilteredResults(filteredData)
     setResultsDuplicate(mainFileDuplicates)
     setExcelColumns(primaryColumn)
@@ -259,11 +276,12 @@ const TableDetail = () => {
   console.log(savedInputsMain)
   console.log(savedResultsSecondary)
   console.log(formData)
+  console.log(filteredResults)
 
   return (
     <div className='flex flex-col gap-8 p-10'>
       <Title level={2}>Daftar Tugas</Title>
-      <form onSubmit={handleSubmit} className='flex justify-between w-full p-6 bg-white rounded-lg'>
+      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
         <div className='flex gap-6'>
           <div className='w-fit'>
             <Select
@@ -280,79 +298,7 @@ const TableDetail = () => {
               }))}
             />
           </div>
-          <div className='w-fit'>
-            <Select
-              allowClear
-              size='large'
-              showSearch
-              style={{ width: '100%', height: '100%' }}
-              placeholder='Pilih Column'
-              value={typeColumn}
-              onChange={(value) => setTypeColumn(value)}
-              options={Object.values(columns).map((col) => ({
-                label: col.label,
-                value: col.value,
-              }))}
-            />
-          </div>
-          {typeTable === 'shopee_product' ? (
-            <button
-              type='button'
-              onClick={() => openDialogWithContent(inputMainFileDialog)}
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
-            >
-              {savedInputsMain.length === 0 ? 'File Utama' : `1 Toko Utama`}
-            </button>
-          ) : (
-            <>
-              <label
-                htmlFor='main-file'
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
-              >
-                {mainFileName}
-              </label>
-              <input
-                name='main-file'
-                type='file'
-                id='main-file'
-                accept={xlsxMimeType}
-                className='hidden'
-                onChange={handleFileChange}
-                required
-                ref={mainFileRef}
-              />
-            </>
-          )}
-          {typeTable === 'shopee_product' ? (
-            <button
-              type='button'
-              onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
-            >
-              {savedInputsSecondary.length === 0 ? 'File Turunan' : `${savedInputsSecondary.length} Toko Cabang`}
-            </button>
-          ) : (
-            <>
-              <label
-                htmlFor='compares-file'
-                className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-200 border-dashed rounded-lg'
-              >
-                {secondaryFileNames}
-              </label>
-              <input
-                name='compares-file'
-                type='file'
-                id='compares-file'
-                accept={xlsxMimeType}
-                className='hidden'
-                onChange={handleFileChange}
-                required
-                multiple
-                ref={secondaryFilesRef}
-              />
-            </>
-          )}
-          {!hideOperator && (
+          {typeTable && (
             <div className='w-fit'>
               <Select
                 allowClear
@@ -360,6 +306,84 @@ const TableDetail = () => {
                 showSearch
                 style={{ width: '100%', height: '100%' }}
                 placeholder='Pilih Column'
+                value={typeColumn}
+                onChange={(value) => setTypeColumn(value)}
+                options={Object.values(columns).map((col) => ({
+                  label: col.label,
+                  value: col.value,
+                }))}
+              />
+            </div>
+          )}
+          {typeColumn && (
+            <>
+              {typeTable === 'shopee_product' ? (
+                <button
+                  type='button'
+                  onClick={() => openDialogWithContent(inputMainFileDialog)}
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                >
+                  {savedInputsMain.length === 0 ? 'File Utama' : `1 Toko Utama`}
+                </button>
+              ) : (
+                <>
+                  <label
+                    htmlFor='main-file'
+                    className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                  >
+                    {mainFileName}
+                  </label>
+                  <input
+                    name='main-file'
+                    type='file'
+                    id='main-file'
+                    accept={xlsxMimeType}
+                    className='hidden'
+                    onChange={handleFileChange}
+                    required
+                    ref={mainFileRef}
+                  />
+                </>
+              )}
+              {typeTable === 'shopee_product' ? (
+                <button
+                  type='button'
+                  onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                >
+                  {savedInputsSecondary.length === 0 ? 'File Turunan' : `${savedInputsSecondary.length} Toko Cabang`}
+                </button>
+              ) : (
+                <>
+                  <label
+                    htmlFor='compares-file'
+                    className='flex gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-3 text-base font-semibold text-gray-600'
+                  >
+                    {secondaryFileNames}
+                  </label>
+                  <input
+                    name='compares-file'
+                    type='file'
+                    id='compares-file'
+                    accept={xlsxMimeType}
+                    className='hidden'
+                    onChange={handleFileChange}
+                    required
+                    multiple
+                    ref={secondaryFilesRef}
+                  />
+                </>
+              )}
+            </>
+          )}
+          {filteredResults.length > 0 && !hideOperator && (
+            <div className='w-fit'>
+              <Select
+                allowClear
+                size='large'
+                showSearch
+                style={{ width: '100%', height: '100%' }}
+                placeholder='Pilih Operator'
                 value={typeOperator}
                 onChange={(value) => setTypeOperator(value)}
                 options={Object.values(operators).map((col) => ({
