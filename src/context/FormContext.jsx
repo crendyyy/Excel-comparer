@@ -12,7 +12,7 @@ export const FormProvider = ({ children }) => {
   const [formInputMain, setFormInputMain] = useState({})
   const [formInputSecondary, setFormInputSecondary] = useState({})
   const [typeColumn, setTypeColumn] = useState()
-  const [typeOperator, setTypeOperator] = useState('Pilih Operator')
+  const [typeOperator, setTypeOperator] = useState()
   const [typeTable, setTypeTable] = useState()
   const [mainFileName, setMainFileName] = useState('File Utama')
   const [mainFilePrice, setMainFilePrice] = useState('Harga Mati')

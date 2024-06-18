@@ -90,6 +90,7 @@ const TableDetail = () => {
       setResultsDuplicatesSecond([])
       setIsSubmited(false)
       setTypeColumn()
+      setTypeOperator()
       setMainFileName('File Utama')
       setSecondaryFileNames('File Turunan')
       setMainFilePrice('Harga Mati')
