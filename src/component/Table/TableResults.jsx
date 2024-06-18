@@ -31,7 +31,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
         const relevantSecondaryDuplicates = secondaryDuplicates.filter((dup) => dup.filename === record.filename)
 
         return (
-          <div className='flex justify-end w-full'>
+          <div className='flex w-full justify-end'>
             <Link
               to={`/table/${encodeURIComponent(record.filename)}`}
               state={{
@@ -42,7 +42,7 @@ const TableResult = ({ results, previousState, duplicate, secondaryDuplicates, e
                   excelColumns: targetColumn,
                 },
               }}
-              className='px-2 py-1 text-sm font-semibold text-white rounded-lg bg-blue-950'
+              className='rounded-lg bg-blue-950 px-2 py-1 text-sm font-semibold text-white'
             >
               Detail
             </Link>
