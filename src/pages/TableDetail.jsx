@@ -49,9 +49,11 @@ const TableDetail = () => {
     setSavedInputsSecondary,
     savedResultsSecondary,
     setSavedResultsSecondary,
+    originalResults,
+    setOriginalResults,
+    setMainFilePrice,
+    setMainFileDiscount,
   } = useContext(FormContext)
-
-  const [originalResults, setOriginalResults] = useState([])
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
@@ -76,14 +78,22 @@ const TableDetail = () => {
         mainFile: typeTable === 'shopee_product' ? savedInputsMain : null,
         secondaryFiles: [],
         type: typeTable,
-        targetColumn: typeColumn,
+        targetColumn: '',
       })
       prevTypeTableRef.current = typeTable
       setSavedInputsMain([])
       setSavedInputsSecondary([])
       setSavedResultsSecondary([])
+      setOriginalResults([])
+      setFilteredResults([])
+      setResultsDuplicate([])
+      setResultsDuplicatesSecond([])
+      setIsSubmited(false)
+      setTypeColumn()
       setMainFileName('File Utama')
       setSecondaryFileNames('File Turunan')
+      setMainFilePrice('Harga Mati')
+      setMainFileDiscount('Harga Coret')
     }
   }, [typeTable, savedInputsMain, setFormData, typeColumn])
 
@@ -221,9 +231,8 @@ const TableDetail = () => {
     const primaryColumn = result.payload.excel
 
     setOriginalResults(result.payload.results) // Simpan hasil asli
-    const filteredData = filterResults(result.payload.results, typeOperator)
 
-    setFilteredResults(filteredData)
+    setFilteredResults(result.payload.results)
     setResultsDuplicate(mainFileDuplicates)
     setExcelColumns(primaryColumn)
     setResultsDuplicatesSecond(secondaryFilesDuplicates)
