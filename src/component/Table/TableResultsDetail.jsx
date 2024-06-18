@@ -83,6 +83,7 @@ const TableResultsDetail = () => {
           title: col.label,
           dataIndex: key,
           key: key,
+          sorter: (a, b) => a.selisih - b.selisih,
           render: (text, record) => {
             const formattedValue =
               key === 'persentase'
@@ -104,7 +105,6 @@ const TableResultsDetail = () => {
               </span>
             )
           },
-          sorter: key === 'selisih' ? (a, b) => a.selisih - b.selisih : undefined,
         }
       } else {
         return {
@@ -112,6 +112,7 @@ const TableResultsDetail = () => {
           dataIndex: key,
           key: key,
           render: (text, record) => renderCell(text, record, key),
+          sorter: (a, b) => a.selisih - b.selisih,
         }
       }
     })
@@ -222,7 +223,7 @@ const TableResultsDetail = () => {
       )}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
+          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
@@ -258,8 +259,8 @@ const TableResultsDetail = () => {
         dataSource={data}
         pagination={true}
       />
-      <div className='flex justify-end w-full'>
-        <Button className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950' onClick={saveTask}>
+      <div className='flex w-full justify-end'>
+        <Button className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white' onClick={saveTask}>
           Simpan Tugas
         </Button>
       </div>
