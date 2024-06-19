@@ -10,7 +10,12 @@ export const useCompareSKUExcel = () => {
   return useMutation({
     mutationFn: ({ data }) => {
       toast.loading('Memproses data...')
-      return axiosClient._post(`/v1/excels/missing-sku`, data)
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      return axiosClient._post(`/v1/excels/missing-sku`, data, config)
     },
 
     onSuccess: () => {

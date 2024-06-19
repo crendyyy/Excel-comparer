@@ -11,21 +11,12 @@ export const useCompareExcel = () => {
     mutationFn: ({ data }) => {
       toast.loading('Memproses data...')
 
-      // Check if data is FormData or JSON
       const isFormData = data instanceof FormData
 
       const config = {
         headers: {
           'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
         },
-      }
-
-      if (isFormData) {
-        for (let pair of data.entries()) {
-          console.log(`${pair[0]}: ${pair[1]}`);
-        }
-      } else {
-        console.log(JSON.stringify(data, null, 2));
       }
       return axiosClient._post(`/v1/excels/compare`, data, config)
     },

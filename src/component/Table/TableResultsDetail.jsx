@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Table, Button, Collapse, Typography } from 'antd'
+import { Table, Button, Collapse, Typography, Flex, Upload } from 'antd'
 import ArrowLeft from '../icons/ArrowLeft'
 import FilterIcon from '../icons/FilterIcon'
 import FilterDialog from '../dialog/FilterDialog'
 import { FormContext } from '../../context/FormContext'
 import useCreateTask from '../../services/tasks/useCreateTask'
 import useDialog from '../../hooks/useDialog'
+import { UploadOutlined } from '@ant-design/icons'
 
 const { Text } = Typography
 
@@ -126,58 +127,65 @@ const TableResultsDetail = () => {
       ...row,
     })) || []
 
-  const handleSaveTask = async () => {
-    const taskData = {
-      name: stripXlsxExtension(filename),
-      type: previousState.typeTable,
-      targetColumn: previousState.typeColumn,
-      config: savedFilters.map((filter) => ({
-        start: filter.valueStart,
-        end: filter.valueEnd,
-        color: filter.color,
-      })),
-      rows: selectedRows.map((row) => ({
-        kode_produk: row.kode_produk,
-        nama_produk: row.nama_produk,
-        kode_variasi: row.kode_variasi,
-        nama_variasi: row.nama_variasi,
-        sku_induk: row.sku_induk,
-        sku_produk: row.sku_produk,
-        harga: row.harga,
-        stok: row.stok,
-        selisih: row.selisih,
-        persentase: row.persentase,
-      })),
-    }
-    navigate('/tugas')
-    saveTaskMutation.mutateAsync({ data: taskData })
-  }
-
-  const handleSaveTaskWeight = async () => {
-    const taskData = {
-      name: stripXlsxExtension(filename),
-      type: previousState.typeTable,
-      targetColumn: previousState.typeColumn,
-      config: savedFilters.map((filter) => ({
-        start: filter.valueStart,
-        end: filter.valueEnd,
-        color: filter.color,
-      })),
-      rows: selectedRows.map((row) => ({
-        kode_produk: row.kode_produk,
-        nama_produk: row.nama_produk,
-        sku_induk: row.sku_induk,
-        berat: row.berat,
-        panjang: row.panjang,
-        lebar: row.lebar,
-        tinggi: row.tinggi,
-        selisih: row.selisih,
-        persentase: row.persentase,
-      })),
-    }
-    navigate('/tugas')
-    saveTaskMutation.mutateAsync({ data: taskData })
-  }
+    const handleSaveTask = async () => {
+      const rowsToSave = selectedRows.length > 0 ? selectedRows : data;
+    
+      const taskData = {
+        name: stripXlsxExtension(filename),
+        type: previousState.typeTable,
+        targetColumn: previousState.typeColumn,
+        config: savedFilters.map((filter) => ({
+          start: filter.valueStart,
+          end: filter.valueEnd,
+          color: filter.color,
+        })),
+        rows: rowsToSave.map((row) => ({
+          kode_produk: row.kode_produk,
+          nama_produk: row.nama_produk,
+          kode_variasi: row.kode_variasi,
+          nama_variasi: row.nama_variasi,
+          sku_induk: row.sku_induk,
+          sku_produk: row.sku_produk,
+          harga: row.harga,
+          stok: row.stok,
+          selisih: row.selisih,
+          persentase: row.persentase,
+        })),
+      };
+    
+      navigate('/tugas');
+      saveTaskMutation.mutateAsync({ data: taskData });
+    };
+    
+    const handleSaveTaskWeight = async () => {
+      const rowsToSave = selectedRows.length > 0 ? selectedRows : data;
+    
+      const taskData = {
+        name: stripXlsxExtension(filename),
+        type: previousState.typeTable,
+        targetColumn: previousState.typeColumn,
+        config: savedFilters.map((filter) => ({
+          start: filter.valueStart,
+          end: filter.valueEnd,
+          color: filter.color,
+        })),
+        rows: rowsToSave.map((row) => ({
+          kode_produk: row.kode_produk,
+          nama_produk: row.nama_produk,
+          sku_induk: row.sku_induk,
+          berat: row.berat,
+          panjang: row.panjang,
+          lebar: row.lebar,
+          tinggi: row.tinggi,
+          selisih: row.selisih,
+          persentase: row.persentase,
+        })),
+      };
+    
+      navigate('/tugas');
+      saveTaskMutation.mutateAsync({ data: taskData });
+    };
+    
   let saveTask = previousState.typeTable === 'shopee_product' ? handleSaveTask : handleSaveTaskWeight
 
   const columnsDuplicate = [
@@ -210,6 +218,8 @@ const TableResultsDetail = () => {
     previousState.secondaryDuplicates.length > 0 &&
     previousState.secondaryDuplicates.some((dup) => dup.filename === filename)
 
+  console.log(selectedRows);
+
   return (
     <div className='flex flex-col gap-8 p-10'>
       {isDialogOpen && (
@@ -223,14 +233,27 @@ const TableResultsDetail = () => {
       )}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
+          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
         </div>
-        <button type='button' onClick={openDialog} className='flex items-center rounded-lg bg-[#110F45] px-3 py-3'>
-          <FilterIcon />
-        </button>
+        <Flex gap={16}>
+          <Upload
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            action='/'
+            maxCount={1}
+            multiple={false}
+          >
+            <Button icon={<UploadOutlined />} size='middle' style={{ height: 40 }}>
+              Upload
+            </Button>
+          </Upload>
+          <Button size='middle' style={{ height: 40 }}>
+            Submit
+          </Button>
+          <Button icon={<FilterIcon />} size='large' onClick={openDialog} type='primary' className='bg-blue-950' />
+        </Flex>
       </div>
 
       {hasSecondaryDuplicates && (
@@ -259,10 +282,22 @@ const TableResultsDetail = () => {
         dataSource={data}
         pagination={true}
       />
-      <div className='flex w-full justify-end'>
-        <Button className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white' onClick={saveTask}>
-          Simpan Tugas
-        </Button>
+      <div className='flex justify-end w-full'>
+        {selectedRows.length === 0 ? (
+          <Button
+            className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+            onClick={saveTask}
+          >
+             Simpan Semua Tugas
+          </Button>
+        ) : (
+          <Button
+            className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+            onClick={saveTask}
+          >
+           Simpan Tugas
+          </Button>
+        )}
       </div>
     </div>
   )
