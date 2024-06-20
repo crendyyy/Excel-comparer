@@ -16,9 +16,11 @@
     "antd": "^5.17.4",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
+    "exceljs": "^4.4.0",
     "framer-motion": "^11.2.6",
     "react-router-dom": "^6.23.1",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "slugify": "^1.6.6"
   },
   "peerDependencies": {
     "react": "^18.2.0",

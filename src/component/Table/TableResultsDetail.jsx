@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Table, Button, Collapse, Typography, Flex, Upload } from 'antd'
+import ExcelJS from 'exceljs'
 import ArrowLeft from '../icons/ArrowLeft'
 import FilterIcon from '../icons/FilterIcon'
 import FilterDialog from '../dialog/FilterDialog'
 import { FormContext } from '../../context/FormContext'
 import useCreateTask from '../../services/tasks/useCreateTask'
 import useDialog from '../../hooks/useDialog'
-import { UploadOutlined } from '@ant-design/icons'
 import InputNameTask from '../dialog/InputNameTask'
 
 const { Text } = Typography
@@ -128,63 +128,70 @@ const TableResultsDetail = () => {
       ...row,
     })) || []
 
-  const handleSaveTask = async () => {
-    const rowsToSave = selectedRows.length > 0 ? selectedRows : data
+  const generateExcekFile = async (rowToSave) => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('My sheet')
 
-    const taskData = {
-      name: taskName,
-      type: previousState.typeTable,
-      targetColumn: previousState.typeColumn,
-      config: savedFilters.map((filter) => ({
-        start: filter.valueStart,
-        end: filter.valueEnd,
-        color: filter.color,
-      })),
-      rows: rowsToSave.map((row) => ({
-        kode_produk: row.kode_produk,
-        nama_produk: row.nama_produk,
-        kode_variasi: row.kode_variasi,
-        nama_variasi: row.nama_variasi,
-        sku_induk: row.sku_induk,
-        sku_produk: row.sku_produk,
-        harga: row.harga,
-        stok: row.stok,
-        selisih: row.selisih,
-        persentase: row.persentase,
-      })),
+    if (previousState.typeTable === 'shopee_product') {
+      worksheet.columns = [
+        { header: 'Kode Produk', key: 'kode_produk', width: 30 },
+        { header: 'Nama Produk', key: 'nama_produk', width: 30 },
+        { header: 'Kode Variasi', key: 'kode_variasi', width: 30 },
+        { header: 'Nama Variasi', key: 'nama_variasi', width: 30 },
+        { header: 'SKU Induk', key: 'sku_induk', width: 30 },
+        { header: 'SKU Produk', key: 'sku_produk', width: 30 },
+        { header: 'Harga', key: 'harga', width: 30 },
+        { header: 'Stok', key: 'stok', width: 30 },
+        { header: 'Selisih', key: 'selisih', width: 30 },
+        { header: 'Persentase', key: 'persentase', width: 30 },
+      ]
+    } else {
+      worksheet.columns = [
+        { header: 'Kode Produk', key: 'kode_produk', width: 30 },
+        { header: 'Nama Produk', key: 'nama_produk', width: 30 },
+        { header: 'SKU Induk', key: 'sku_induk', width: 30 },
+        { header: 'Berat', key: 'berat', width: 30 },
+        { header: 'Panjang', key: 'panjang', width: 30 },
+        { header: 'Lebar', key: 'lebar', width: 30 },
+        { header: 'Tinggi', key: 'tinggi', width: 30 },
+        { header: 'Selisih', key: 'selisih', width: 30 },
+        { header: 'Persentase', key: 'persentase', width: 30 },
+      ]
     }
 
-    navigate('/tugas')
-    saveTaskMutation.mutateAsync({ data: taskData })
+    rowToSave.forEach((row) => {
+      worksheet.addRow(row)
+    })
+    const buffer = await workbook.xlsx.writeBuffer()
+    return buffer
   }
 
-  const handleSaveTaskWeight = async () => {
+  const handleSaveTask = async (name) => {
     const rowsToSave = selectedRows.length > 0 ? selectedRows : data
+    const buffer = generateExcekFile(rowsToSave)
 
-    const taskData = {
-      name: taskName,
-      type: previousState.typeTable,
-      targetColumn: previousState.typeColumn,
-      config: savedFilters.map((filter) => ({
-        start: filter.valueStart,
-        end: filter.valueEnd,
-        color: filter.color,
-      })),
-      rows: rowsToSave.map((row) => ({
-        kode_produk: row.kode_produk,
-        nama_produk: row.nama_produk,
-        sku_induk: row.sku_induk,
-        berat: row.berat,
-        panjang: row.panjang,
-        lebar: row.lebar,
-        tinggi: row.tinggi,
-        selisih: row.selisih,
-        persentase: row.persentase,
-      })),
-    }
+    const formTask = new FormData()
+    formTask.append('name', name)
+    formTask.append('type', previousState.typeTable)
+    formTask.append('targetColumn', previousState.typeColumn)
+    const configArray = savedFilters.map((filter) => ({
+      start: filter.valueStart,
+      end: filter.valueEnd,
+      color: filter.color,
+    }))
+    configArray.forEach((configItem, index) => {
+      formTask.append(`config[${index}][start]`, configItem.start)
+      formTask.append(`config[${index}][end]`, configItem.end)
+      formTask.append(`config[${index}][color]`, configItem.color)
+    })
+    formTask.append(
+      'file',
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `${name}.xlsx`,
+    )
 
     navigate('/tugas')
-    saveTaskMutation.mutateAsync({ data: taskData })
+    saveTaskMutation.mutateAsync({ data: formTask })
   }
 
   const columnsDuplicate = [
@@ -217,7 +224,6 @@ const TableResultsDetail = () => {
     previousState.secondaryDuplicates.length > 0 &&
     previousState.secondaryDuplicates.some((dup) => dup.filename === filename)
 
-  console.log(selectedRows)
 
   const openDialogContent = (content) => {
     setDialogContent(content)
@@ -242,12 +248,7 @@ const TableResultsDetail = () => {
         onClose={closeDialog}
         onSubmit={(name) => {
           setTaskName(name)
-          console.log(name)
-          if (previousState.typeTable === 'shopee_product') {
-            handleSaveTask()
-          } else {
-            handleSaveTaskWeight()
-          }
+          handleSaveTask(name)
         }}
       />
     )
@@ -299,12 +300,12 @@ const TableResultsDetail = () => {
         pagination={true}
       />
       <div className='flex w-full justify-end'>
-          <Button
-            className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
-            onClick={() => openDialogContent(inputNameTask)}
-          >
-            {selectedRows.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}
-          </Button>
+        <Button
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
+          onClick={() => openDialogContent(inputNameTask)}
+        >
+          {selectedRows.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}
+        </Button>
       </div>
     </div>
   )

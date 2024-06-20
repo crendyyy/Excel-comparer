@@ -12,7 +12,12 @@ export const useCreateTask = () => {
   return useMutation({
     mutationFn: ({ data }) => {
       toast.loading('Membuat tugas...')
-      return axiosClient._post(`/v1/tasks`, data)
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+      return axiosClient._post(`/v1/tasks`, data, config)
     },
 
     onSuccess: () => {

@@ -12,17 +12,22 @@ const InputMainFileDialog = ({ onClose }) => {
     setMainFilePrice,
     mainFileDiscount,
     setMainFileDiscount,
+    mainFileCustom, 
+    setMainFileCustom,
     savedInputsMain,
     setSavedInputsMain,
   } = useContext(FormContext)
 
   const [tempMainFileName, setTempMainFileName] = useState(mainFilePrice)
   const [tempMainFileDiscount, setTempMainFileDiscount] = useState(mainFileDiscount)
+  const [tempMainFileCustom, setTempMainFileCustom] = useState(mainFileCustom)
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
+  const [tempMainFileCustomFile, setTempMainFileCustomFile] = useState(null)
 
   const mainFilePriceRef = useRef(null)
   const mainFileDiscountRef = useRef(null)
+  const mainFileCustomRef = useRef(null)
 
   const submitCombinedFiles = useFindActualPrice()
   const truncateFileName = (name, maxLength = 40) =>
@@ -38,22 +43,29 @@ const InputMainFileDialog = ({ onClose }) => {
       setTempMainFileDiscountFile(files[0])
       const truncatedName = truncateFileName(files[0].name)
       setTempMainFileDiscount(truncatedName)
+    } else if (name === 'main-file-custom') {
+      setTempMainFileCustomFile(files[0])
+      const truncatedName = truncateFileName(files[0].name)
+      setMainFileCustom(truncatedName)
     }
   }
 
   const handleConfirm = async (e) => {
     e.preventDefault()
-    if (tempMainFilePrice || tempMainFileDiscountFile) {
+    if (tempMainFilePrice || tempMainFileDiscountFile || tempMainFileCustom) {
       const formInputMainData = new FormData()
       formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)
       formInputMainData.append('discountFile', tempMainFileDiscountFile || formInputMain.discountFile)
+      formInputMainData.append('customFile', tempMainFileCustomFile || formInputMain.customFile)
 
       setFormInputMain({
         mainFile: tempMainFilePrice || formInputMain.mainFile,
         discountFile: tempMainFileDiscountFile || formInputMain.discountFile,
+        customFile: tempMainFileCustomFile || formInputMain.customFile,
       })
       setMainFilePrice(tempMainFileName)
       setMainFileDiscount(tempMainFileDiscount)
+      setMainFileCustom(tempMainFileCustom)
 
       const response = await submitCombinedFiles.mutateAsync({ data: formInputMainData })
 
@@ -71,8 +83,10 @@ const InputMainFileDialog = ({ onClose }) => {
     if (!mainFilePrice && !mainFileDiscount) {
       setTempMainFileName('Harga Mati')
       setTempMainFileDiscount('Harga Coret')
+      setTempMainFileCustom('Harga Khusus')
       setTempMainFilePrice(null)
       setTempMainFileDiscountFile(null)
+      setTempMainFileCustomFile(null)
     }
     onClose()
   }
@@ -115,6 +129,22 @@ const InputMainFileDialog = ({ onClose }) => {
               onChange={handleFileChange}
               required
               ref={mainFileDiscountRef}
+            />
+            <label
+              htmlFor='main-file-custom'
+              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+            >
+              {tempMainFileCustom}
+            </label>
+            <input
+              name='main-file-custom'
+              type='file'
+              id='main-file-custom'
+              accept={xlsxMimeType}
+              className='hidden'
+              onChange={handleFileChange}
+              required
+              ref={mainFileCustomRef}
             />
           </div>
         </div>

@@ -15,6 +15,8 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     setSecondaryFilePrice,
     secondaryFileDiscount,
     setSecondaryFileDiscount,
+    secondaryFileCustom,
+    setSecondaryFileCustom,
     savedInputsSecondary,
     setSavedInputsSecondary,
     savedResultsSecondary,
@@ -23,8 +25,10 @@ const InputSecondaryFileDialog = ({ onClose }) => {
 
   const [tempMainFileName, setTempMainFileName] = useState('Harga Mati')
   const [tempMainFileDiscount, setTempMainFileDiscount] = useState('Harga Coret')
+  const [tempMainFileCustom, setTempMainFileCustom] = useState('Harga Khusus')
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
+  const [tempMainFileCustomFile, setTempMainFileCustomFile] = useState(null)
   const [additionalInputs, setAdditionalInputs] = useState([])
   const [isMainFilesSaved, setIsMainFilesSaved] = useState(true)
   const [editIndex, setEditIndex] = useState(null)
@@ -34,6 +38,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   const contentHeight = useRef(null)
   const mainFilePriceRef = useRef(null)
   const mainFileDiscountRef = useRef(null)
+  const mainFileCustomRef = useRef(null)
 
   const submitCombinedFiles = useFindActualPrice()
 
@@ -62,6 +67,9 @@ const InputSecondaryFileDialog = ({ onClose }) => {
       } else if (name === 'main-file-discount') {
         setTempMainFileDiscountFile(files[0])
         setTempMainFileDiscount(truncateFileName(files[0].name))
+      } else if (name === 'main-file-custom') {
+        setTempMainFileCustomFile(files[0])
+        setTempMainFileCustom(truncateFileName(files[0].name))
       }
     } else {
       const newAdditionalInputs = [...additionalInputs]
@@ -71,6 +79,9 @@ const InputSecondaryFileDialog = ({ onClose }) => {
       } else if (name === `additional-file-discount-${index}`) {
         newAdditionalInputs[index].discount = files[0]
         newAdditionalInputs[index].discountName = truncateFileName(files[0].name)
+      } else if (name === `additional-file-custom-${index}`) {
+        newAdditionalInputs[index].custom = files[0]
+        newAdditionalInputs[index].customName = truncateFileName(files[0].name)
       }
       setAdditionalInputs(newAdditionalInputs)
     }
@@ -79,21 +90,30 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   const handleAddInput = () => {
     setAdditionalInputs([
       ...additionalInputs,
-      { price: null, priceName: 'Harga Mati', discount: null, discountName: 'Harga Coret' },
+      {
+        price: null,
+        priceName: 'Harga Mati',
+        discount: null,
+        discountName: 'Harga Coret',
+        custom: null,
+        customName: 'Harga Khusus',
+      },
     ])
   }
 
   const handleConfirm = async () => {
     const inputsAfterDeletion = savedInputsSecondary.filter((_, index) => !indicesToDelete.includes(index))
-    const validInputs = additionalInputs.filter((input) => input.price !== null && input.discount !== null)
+    const validInputs = additionalInputs.filter((input) => input.price !== null && input.discount !== null && input.custom !== null)
     const combinedFiles = [
-      ...(tempMainFilePrice && tempMainFileDiscountFile
+      ...(tempMainFilePrice && tempMainFileDiscountFile && tempMainFileCustomFile
         ? [
             {
               price: tempMainFilePrice,
               discount: tempMainFileDiscountFile,
+              custom: tempMainFileCustomFile,
               priceName: tempMainFileName,
               discountName: tempMainFileDiscount,
+              customName: tempMainFileCustom,
             },
           ]
         : []),
@@ -117,10 +137,12 @@ const InputSecondaryFileDialog = ({ onClose }) => {
         const formInputSecondaryData = new FormData()
         formInputSecondaryData.append('mainFile', input.price || formInputSecondary.mainFile)
         formInputSecondaryData.append('discountFile', input.discount || formInputSecondary.discountFile)
+        formInputSecondaryData.append('customFile', input.custom || formInputSecondary.customFile)
 
         setFormInputSecondary({
           mainFile: input.price || formInputSecondary.mainFile,
           discountFile: input.discount || formInputSecondary.discountFile,
+          customFile: input.custom || formInputSecondary.customFile,
         })
 
         const response = await submitCombinedFiles.mutateAsync({ data: formInputSecondaryData })
@@ -134,6 +156,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
 
       setSecondaryFilePrice(tempMainFileName)
       setSecondaryFileDiscount(tempMainFileDiscount)
+      setSecondaryFileCustom(tempMainFileCustom)
       setSavedInputsSecondary(newSavedInputs)
       setSavedResultsSecondary(dataResults)
       setIsMainFilesSaved(false)
@@ -141,6 +164,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
       setAdditionalInputs([])
       setTempMainFilePrice(null)
       setTempMainFileDiscountFile(null)
+      setTempMainFileCustomFile(null)
       setEditIndex(null)
       setIndicesToDelete([])
       onClose()
@@ -152,8 +176,10 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   const handleCancel = () => {
     setTempMainFileName(secondaryFilePrice || 'Harga Mati')
     setTempMainFileDiscount(secondaryFileDiscount || 'Harga Coret')
+    setTempMainFileCustom(secondaryFileCustom || 'Harga Khusus')
     setTempMainFilePrice(null)
     setTempMainFileDiscountFile(null)
+    setTempMainFileCustomFile(null)
     setAdditionalInputs([])
     setEditIndex(null)
     onClose()
@@ -171,6 +197,8 @@ const InputSecondaryFileDialog = ({ onClose }) => {
           priceName: inputToEdit.priceName,
           discount: inputToEdit.discount,
           discountName: inputToEdit.discountName,
+          custom: inputToEdit.custom,
+          customName: inputToEdit.customName,
         },
       ])
       setEditIndex(index)
@@ -200,7 +228,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
   console.log(savedResultsSecondary)
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
+      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           <div
@@ -211,7 +239,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               <div className='flex flex-col gap-4'>
                 <label
                   htmlFor='main-file-price'
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {tempMainFileName}
                 </label>
@@ -227,7 +255,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor='main-file-discount'
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {tempMainFileDiscount}
                 </label>
@@ -240,6 +268,22 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                   onChange={handleFileChange}
                   required
                   ref={mainFileDiscountRef}
+                />
+                <label
+                  htmlFor='main-file-custom'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                >
+                  {tempMainFileCustom}
+                </label>
+                <input
+                  name='main-file-custom'
+                  type='file'
+                  id='main-file-custom'
+                  accept={xlsxMimeType}
+                  className='hidden'
+                  onChange={handleFileChange}
+                  required
+                  ref={mainFileCustomRef}
                 />
               </div>
             )}
@@ -255,22 +299,22 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 </label>
                 <div className='flex gap-2'>
                   <button
-                    className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
+                    className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
                     onClick={() => handleDownloadInput(index)}
                   >
                     <DownloadIcon />
                   </button>
                   <button
-                    className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
+                    className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
                     onClick={() => handleEditInput(index)}
                   >
                     <PencilIcon />
                   </button>
                   <button
-                    className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
+                    className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
                     onClick={() => handleDeleteInput(index)}
                   >
-                    <TrashIcon className='w-5 h-5 text-red-500' />
+                    <TrashIcon className='h-5 w-5 text-red-500' />
                   </button>
                 </div>
               </div>
@@ -279,7 +323,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               <div className='flex flex-col gap-4' key={index}>
                 <label
                   htmlFor={`additional-file-price-${index}`}
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {input.priceName}
                 </label>
@@ -293,7 +337,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor={`additional-file-discount-${index}`}
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {input.discountName}
                 </label>
@@ -305,12 +349,26 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                   className='hidden'
                   onChange={(e) => handleFileChange(e, index)}
                 />
+                <label
+                  htmlFor={`additional-file-custom-${index}`}
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                >
+                  {input.customName}
+                </label>
+                <input
+                  name={`additional-file-custom-${index}`}
+                  type='file'
+                  id={`additional-file-custom-${index}`}
+                  accept={xlsxMimeType}
+                  className='hidden'
+                  onChange={(e) => handleFileChange(e, index)}
+                />
               </div>
             ))}
           </div>
           {editIndex === null && (
             <button
-              className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+              className='flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
               onClick={handleAddInput}
             >
               Tambah
@@ -320,13 +378,13 @@ const InputSecondaryFileDialog = ({ onClose }) => {
         <div className='flex h-12 gap-6'>
           <button
             onClick={handleCancel}
-            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
           >
             Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg bg-blue-950 text-base font-bold text-white'
           >
             Konfirmasi
           </button>

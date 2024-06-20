@@ -1,13 +1,12 @@
 import Dialog from '../shared/Dialog'
 import React, { useState, useContext } from 'react'
-import { FormContext } from '../../context/FormContext'
 import { Input, InputNumber } from 'antd'
 
 const InputNameTask = ({ onClose, onSubmit }) => {
     const [taskName, setTaskName] = useState('')
 
     const handleConfirm = () => {
-        onSubmit(taskName)
+      onSubmit(taskName)
     }
   return (
     <Dialog onCancel={onClose}>
