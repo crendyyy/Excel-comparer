@@ -17,6 +17,7 @@
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.2.6",
     "react-router-dom": "^6.23.1",
     "react-toastify": "^10.0.5",

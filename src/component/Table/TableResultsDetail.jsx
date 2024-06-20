@@ -9,6 +9,7 @@ import { FormContext } from '../../context/FormContext'
 import useCreateTask from '../../services/tasks/useCreateTask'
 import useDialog from '../../hooks/useDialog'
 import InputNameTask from '../dialog/InputNameTask'
+import { saveAs } from 'file-saver'
 
 const { Text } = Typography
 
@@ -168,7 +169,7 @@ const TableResultsDetail = () => {
 
   const handleSaveTask = async (name) => {
     const rowsToSave = selectedRows.length > 0 ? selectedRows : data
-    const buffer = generateExcekFile(rowsToSave)
+    const buffer = await generateExcekFile(rowsToSave)
 
     const formTask = new FormData()
     formTask.append('name', name)
@@ -223,7 +224,6 @@ const TableResultsDetail = () => {
     previousState.secondaryDuplicates &&
     previousState.secondaryDuplicates.length > 0 &&
     previousState.secondaryDuplicates.some((dup) => dup.filename === filename)
-
 
   const openDialogContent = (content) => {
     setDialogContent(content)
