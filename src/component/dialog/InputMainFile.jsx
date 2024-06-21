@@ -30,6 +30,7 @@ const InputMainFileDialog = ({ onClose }) => {
   const mainFileCustomRef = useRef(null)
 
   const submitCombinedFiles = useFindActualPrice()
+  
   const truncateFileName = (name, maxLength = 40) =>
     name.length > maxLength ? `${name.substring(0, maxLength)}...` : name
 
@@ -46,13 +47,13 @@ const InputMainFileDialog = ({ onClose }) => {
     } else if (name === 'main-file-custom') {
       setTempMainFileCustomFile(files[0])
       const truncatedName = truncateFileName(files[0].name)
-      setMainFileCustom(truncatedName)
+      setTempMainFileCustom(truncatedName)
     }
   }
 
   const handleConfirm = async (e) => {
     e.preventDefault()
-    if (tempMainFilePrice || tempMainFileDiscountFile || tempMainFileCustom) {
+    if (tempMainFilePrice || tempMainFileDiscountFile || tempMainFileCustomFile) {
       const formInputMainData = new FormData()
       formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)
       formInputMainData.append('discountFile', tempMainFileDiscountFile || formInputMain.discountFile)
@@ -80,7 +81,7 @@ const InputMainFileDialog = ({ onClose }) => {
     onClose()
   }
   const handleCancel = () => {
-    if (!mainFilePrice && !mainFileDiscount) {
+    if (!mainFilePrice && !mainFileDiscount && !mainFileCustom) {
       setTempMainFileName('Harga Mati')
       setTempMainFileDiscount('Harga Coret')
       setTempMainFileCustom('Harga Khusus')

@@ -10,6 +10,7 @@ import useCreateTask from '../../services/tasks/useCreateTask'
 import useDialog from '../../hooks/useDialog'
 import InputNameTask from '../dialog/InputNameTask'
 import { saveAs } from 'file-saver'
+import { UploadOutlined } from '@ant-design/icons'
 
 const { Text } = Typography
 
@@ -170,6 +171,10 @@ const TableResultsDetail = () => {
   const handleSaveTask = async (name) => {
     const rowsToSave = selectedRows.length > 0 ? selectedRows : data
     const buffer = await generateExcekFile(rowsToSave)
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `${name}.xlsx`,
+    )
 
     const formTask = new FormData()
     formTask.append('name', name)
@@ -259,18 +264,27 @@ const TableResultsDetail = () => {
       {isDialogOpen && dialogContent}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
+          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
         </div>
-        <Button
-          icon={<FilterIcon />}
-          size='large'
-          onClick={() => openDialogContent(filterDialog)}
-          type='primary'
-          className='bg-blue-950'
-        />
+        <Flex gap={16}>
+          <Upload
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            action='/'
+            maxCount={1}
+            multiple={false}
+          >
+            <Button icon={<UploadOutlined />} size='middle' style={{ height: 40 }}>
+              Upload
+            </Button>
+          </Upload>
+          <Button size='middle' style={{ height: 40 }}>
+            Submit
+          </Button>
+          <Button icon={<FilterIcon />} size='large' onClick={openDialog} type='primary' className='bg-blue-950' />
+        </Flex>
       </div>
 
       {hasSecondaryDuplicates && (
@@ -299,9 +313,9 @@ const TableResultsDetail = () => {
         dataSource={data}
         pagination={true}
       />
-      <div className='flex w-full justify-end'>
+      <div className='flex justify-end w-full'>
         <Button
-          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
+          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
           onClick={() => openDialogContent(inputNameTask)}
         >
           {selectedRows.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}

@@ -53,6 +53,7 @@ const TableDetail = () => {
     setOriginalResults,
     setMainFilePrice,
     setMainFileDiscount,
+    setMainFileCustom,
   } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
@@ -94,7 +95,7 @@ const TableDetail = () => {
       setMainFileName('File Utama')
       setSecondaryFileNames('File Turunan')
       setMainFilePrice('Harga Mati')
-      setMainFileDiscount('Harga Coret')
+      setMainFileCustom('Harga Khusus')
     }
   }, [typeTable, savedInputsMain, setFormData, typeColumn])
 
