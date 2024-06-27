@@ -10,7 +10,7 @@ export const FormProvider = ({ children }) => {
     targetColumn: '',
   })
   const [formInputMain, setFormInputMain] = useState({})
-  const [formInputSecondary, setFormInputSecondary] = useState({})
+  const [formInputSecondary, setFormInputSecondary] = useState([])
   const [typeColumn, setTypeColumn] = useState()
   const [typeOperator, setTypeOperator] = useState()
   const [typeTable, setTypeTable] = useState()

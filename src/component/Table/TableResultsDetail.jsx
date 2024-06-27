@@ -269,22 +269,13 @@ const TableResultsDetail = () => {
           </Link>
           <h1 className='font-bold'>{filename}</h1>
         </div>
-        <Flex gap={16}>
-          <Upload
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            action='/'
-            maxCount={1}
-            multiple={false}
-          >
-            <Button icon={<UploadOutlined />} size='middle' style={{ height: 40 }}>
-              Upload
-            </Button>
-          </Upload>
-          <Button size='middle' style={{ height: 40 }}>
-            Submit
-          </Button>
-          <Button icon={<FilterIcon />} size='large' onClick={openDialog} type='primary' className='bg-blue-950' />
-        </Flex>
+        <Button
+          icon={<FilterIcon />}
+          size='large'
+          onClick={() => openDialogContent(filterDialog)}
+          type='primary'
+          className='bg-blue-950'
+        />
       </div>
 
       {hasSecondaryDuplicates && (

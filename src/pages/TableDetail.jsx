@@ -54,6 +54,8 @@ const TableDetail = () => {
     setMainFilePrice,
     setMainFileDiscount,
     setMainFileCustom,
+    setFormInputMain,
+    setFormInputSecondary,
   } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
@@ -83,6 +85,8 @@ const TableDetail = () => {
       })
       prevTypeTableRef.current = typeTable
       setSavedInputsMain([])
+      setFormInputMain({})
+      setFormInputSecondary([])
       setSavedInputsSecondary([])
       setSavedResultsSecondary([])
       setOriginalResults([])
@@ -95,6 +99,7 @@ const TableDetail = () => {
       setMainFileName('File Utama')
       setSecondaryFileNames('File Turunan')
       setMainFilePrice('Harga Mati')
+      setMainFileDiscount('Harga Coret')
       setMainFileCustom('Harga Khusus')
     }
   }, [typeTable, savedInputsMain, setFormData, typeColumn])
@@ -283,11 +288,6 @@ const TableDetail = () => {
     setDialogContent(content)
     openDialog()
   }
-
-  console.log(savedInputsMain)
-  console.log(savedResultsSecondary)
-  console.log(formData)
-  console.log(filteredResults)
 
   return (
     <div className='flex flex-col gap-8 p-10'>

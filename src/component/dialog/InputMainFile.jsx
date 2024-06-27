@@ -12,7 +12,7 @@ const InputMainFileDialog = ({ onClose }) => {
     setMainFilePrice,
     mainFileDiscount,
     setMainFileDiscount,
-    mainFileCustom, 
+    mainFileCustom,
     setMainFileCustom,
     savedInputsMain,
     setSavedInputsMain,
@@ -30,7 +30,7 @@ const InputMainFileDialog = ({ onClose }) => {
   const mainFileCustomRef = useRef(null)
 
   const submitCombinedFiles = useFindActualPrice()
-  
+
   const truncateFileName = (name, maxLength = 40) =>
     name.length > maxLength ? `${name.substring(0, maxLength)}...` : name
 
@@ -53,6 +53,10 @@ const InputMainFileDialog = ({ onClose }) => {
 
   const handleConfirm = async (e) => {
     e.preventDefault()
+    if (!tempMainFilePrice || !tempMainFileDiscountFile) {
+      onClose()
+      return
+    }
     if (tempMainFilePrice || tempMainFileDiscountFile || tempMainFileCustomFile) {
       const formInputMainData = new FormData()
       formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)
@@ -80,6 +84,7 @@ const InputMainFileDialog = ({ onClose }) => {
     }
     onClose()
   }
+  
   const handleCancel = () => {
     if (!mainFilePrice && !mainFileDiscount && !mainFileCustom) {
       setTempMainFileName('Harga Mati')
@@ -91,7 +96,6 @@ const InputMainFileDialog = ({ onClose }) => {
     }
     onClose()
   }
-  console.log(savedInputsMain)
 
   return (
     <Dialog onCancel={handleCancel}>
