@@ -14,6 +14,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     type: { value: '', parent: 'excel' },
     status: { value: '' },
   })
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
   const handleFiltersChange = (field, value) => {
     setFilters((prevFilters) => ({
@@ -23,6 +24,15 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
         value,
       },
     }))
+  }
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
   }
 
   const filteredTasks = useMemo(() => {
@@ -65,6 +75,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     ],
     [],
   )
+  console.log(rowSelection);
 
   return (
     <>
@@ -111,6 +122,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       </Flex>
 
       <Table
+        rowSelection={rowSelection}
         pagination={true}
         onRow={(record) => ({
           onClick: () => navigate(`/tugas/${record.key}`),

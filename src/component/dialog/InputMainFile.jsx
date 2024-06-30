@@ -53,10 +53,14 @@ const InputMainFileDialog = ({ onClose }) => {
 
   const handleConfirm = async (e) => {
     e.preventDefault()
+
     if (!tempMainFilePrice || !tempMainFileDiscountFile) {
-      onClose()
-      return
+      if(!formInputMain.mainFile || !formInputMain.discountFile){
+        onClose()
+        return
+      }
     }
+
     if (tempMainFilePrice || tempMainFileDiscountFile || tempMainFileCustomFile) {
       const formInputMainData = new FormData()
       formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)

@@ -103,7 +103,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
 
   const handleConfirm = async () => {
     const inputsAfterDeletion = savedInputsSecondary.filter((_, index) => !indicesToDelete.includes(index))
-    const validInputs = additionalInputs.filter((input) => input.price !== null && input.discount !== null && input.custom !== null)
+    const validInputs = additionalInputs.filter((input) => input.price !== null && input.discount !== null)
     const combinedFiles = [
       ...(tempMainFilePrice && tempMainFileDiscountFile
         ? [
@@ -225,7 +225,6 @@ const InputSecondaryFileDialog = ({ onClose }) => {
     }
   }
 
-  console.log(savedResultsSecondary)
   return (
     <Dialog onCancel={handleCancel}>
       <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
@@ -310,12 +309,14 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                   >
                     <PencilIcon />
                   </button>
-                  <button
+                  {editIndex === null && (
+                    <button
                     className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
                     onClick={() => handleDeleteInput(index)}
-                  >
+                    >
                     <TrashIcon className='w-5 h-5 text-red-500' />
                   </button>
+                    )}
                 </div>
               </div>
             ))}

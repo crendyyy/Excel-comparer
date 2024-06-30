@@ -19,9 +19,7 @@ const TableResultsDetail = () => {
   const location = useLocation()
   const { result, previousState } = location.state || {}
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
   const [dialogContent, setDialogContent] = useState()
-  const [taskName, setTaskName] = useState('')
   const { savedFilters, setFilterCriteria } = useContext(FormContext)
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const navigate = useNavigate()
@@ -30,9 +28,8 @@ const TableResultsDetail = () => {
 
   const processedTypeColumn = previousState.typeColumn
 
-  const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
+  const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys)
-    setSelectedRows(newSelectedRows)
   }
 
   const rowSelection = {
@@ -80,7 +77,19 @@ const TableResultsDetail = () => {
   }
 
   const generateColumns = (tableColumns) => {
-    return tableColumns.map((col) => {
+    const compareColums = [
+      ...tableColumns,
+      {
+        label: 'Selisih',
+        key: 'selisih',
+      },
+      {
+        label: 'Persentase',
+        key: 'persentase',
+      },
+    ]
+    const missingSkuColumns = processedTypeColumn === 'sku_produk' ? tableColumns : compareColums
+    return missingSkuColumns.map((col) => {
       const key = col.key
       if (key === 'persentase' || key === 'selisih') {
         return {
@@ -133,33 +142,21 @@ const TableResultsDetail = () => {
   const generateExcekFile = async (rowToSave) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('My sheet')
+    const compareColums = [
+      ...previousState.tableColumns,
+      {
+        label: 'Selisih',
+        key: 'selisih',
+      },
+      {
+        label: 'Persentase',
+        key: 'persentase',
+      },
+    ]
+    const missingSkuColumns = processedTypeColumn === 'sku_produk' ? previousState.tableColumns : compareColums
 
-    if (previousState.typeTable === 'shopee_product') {
-      worksheet.columns = [
-        { header: 'Kode Produk', key: 'kode_produk', width: 30 },
-        { header: 'Nama Produk', key: 'nama_produk', width: 30 },
-        { header: 'Kode Variasi', key: 'kode_variasi', width: 30 },
-        { header: 'Nama Variasi', key: 'nama_variasi', width: 30 },
-        { header: 'SKU Induk', key: 'sku_induk', width: 30 },
-        { header: 'SKU Produk', key: 'sku_produk', width: 30 },
-        { header: 'Harga', key: 'harga', width: 30 },
-        { header: 'Stok', key: 'stok', width: 30 },
-        { header: 'Selisih', key: 'selisih', width: 30 },
-        { header: 'Persentase', key: 'persentase', width: 30 },
-      ]
-    } else {
-      worksheet.columns = [
-        { header: 'Kode Produk', key: 'kode_produk', width: 30 },
-        { header: 'Nama Produk', key: 'nama_produk', width: 30 },
-        { header: 'SKU Induk', key: 'sku_induk', width: 30 },
-        { header: 'Berat', key: 'berat', width: 30 },
-        { header: 'Panjang', key: 'panjang', width: 30 },
-        { header: 'Lebar', key: 'lebar', width: 30 },
-        { header: 'Tinggi', key: 'tinggi', width: 30 },
-        { header: 'Selisih', key: 'selisih', width: 30 },
-        { header: 'Persentase', key: 'persentase', width: 30 },
-      ]
-    }
+    const columns = missingSkuColumns.map((col) => ({ header: col.label, key: col.key, width: 30 }))
+    worksheet.columns = columns
 
     rowToSave.forEach((row) => {
       worksheet.addRow(row)
@@ -169,7 +166,7 @@ const TableResultsDetail = () => {
   }
 
   const handleSaveTask = async (name) => {
-    const rowsToSave = selectedRows.length > 0 ? selectedRows : data
+    const rowsToSave = selectedRowKeys.length > 0 ? selectedRowKeys : data
     const buffer = await generateExcekFile(rowsToSave)
     saveAs(
       new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
@@ -252,7 +249,6 @@ const TableResultsDetail = () => {
       <InputNameTask
         onClose={closeDialog}
         onSubmit={(name) => {
-          setTaskName(name)
           handleSaveTask(name)
         }}
       />
@@ -264,7 +260,7 @@ const TableResultsDetail = () => {
       {isDialogOpen && dialogContent}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
+          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
@@ -295,21 +291,17 @@ const TableResultsDetail = () => {
         />
       )}
       <Table
-        className='custom-table-header'
-        rowSelection={{
-          type: 'checkbox',
-          ...rowSelection,
-        }}
+        rowSelection={{ ...rowSelection }}
         columns={columns}
         dataSource={data}
         pagination={true}
       />
-      <div className='flex justify-end w-full'>
+      <div className='flex w-full justify-end'>
         <Button
-          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
           onClick={() => openDialogContent(inputNameTask)}
         >
-          {selectedRows.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}
+          {selectedRowKeys.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}
         </Button>
       </div>
     </div>
