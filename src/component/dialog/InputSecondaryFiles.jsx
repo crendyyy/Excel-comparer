@@ -220,14 +220,13 @@ const InputSecondaryFileDialog = ({ onClose }) => {
       const filename = combinedResult.path
       const downloadLink = document.createElement('a')
       downloadLink.href = `${basePath}/${filename}`
-      downloadLink.download = filename
       downloadLink.click()
     }
   }
 
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
+      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           <div
@@ -238,7 +237,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               <div className='flex flex-col gap-4'>
                 <label
                   htmlFor='main-file-price'
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {tempMainFileName}
                 </label>
@@ -254,7 +253,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor='main-file-discount'
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {tempMainFileDiscount}
                 </label>
@@ -270,7 +269,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor='main-file-custom'
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {tempMainFileCustom}
                 </label>
@@ -298,23 +297,23 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 </label>
                 <div className='flex gap-2'>
                   <button
-                    className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
+                    className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
                     onClick={() => handleDownloadInput(index)}
                   >
                     <DownloadIcon />
                   </button>
                   <button
-                    className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
+                    className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
                     onClick={() => handleEditInput(index)}
                   >
                     <PencilIcon />
                   </button>
                   {editIndex === null && (
                     <button
-                      className='flex h-full w-12 items-center justify-center rounded-lg border border-solid border-gray-300'
+                      className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
                       onClick={() => handleDeleteInput(index)}
                     >
-                      <TrashIcon className='h-5 w-5 text-red-500' />
+                      <TrashIcon className='w-5 h-5 text-red-500' />
                     </button>
                   )}
                 </div>
@@ -324,7 +323,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
               <div className='flex flex-col gap-4' key={index}>
                 <label
                   htmlFor={`additional-file-price-${index}`}
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {input.priceName}
                 </label>
@@ -338,7 +337,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor={`additional-file-discount-${index}`}
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {input.discountName}
                 </label>
@@ -352,7 +351,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                 />
                 <label
                   htmlFor={`additional-file-custom-${index}`}
-                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
+                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
                 >
                   {input.customName}
                 </label>
@@ -369,7 +368,7 @@ const InputSecondaryFileDialog = ({ onClose }) => {
           </div>
           {editIndex === null && (
             <button
-              className='flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
+              className='flex items-center justify-center w-full h-8 gap-1 text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
               onClick={handleAddInput}
             >
               Tambah
@@ -379,13 +378,13 @@ const InputSecondaryFileDialog = ({ onClose }) => {
         <div className='flex h-12 gap-6'>
           <button
             onClick={handleCancel}
-            className='flex h-full w-full items-center justify-center rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
+            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
           >
             Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex h-full w-full items-center justify-center rounded-lg bg-blue-950 text-base font-bold text-white'
+            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
           >
             Konfirmasi
           </button>

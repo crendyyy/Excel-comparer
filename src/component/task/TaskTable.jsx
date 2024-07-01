@@ -6,9 +6,12 @@ import Badge from '../shared/Badge'
 import { ExcelType, TaskStatus } from '../../libs/enum'
 import { dateFormatter, filterResponse } from '../../libs/utils'
 import useDownloadTask from '../../services/tasks/useDownloadTask'
+import useDialog from '../../hooks/useDialog'
+import InputNameTask from '../dialog/InputNameTask'
 
 const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
   const navigate = useNavigate()
+  const { isDialogOpen, openDialog, closeDialog } = useDialog()
 
   const downloadTaskMutation = useDownloadTask()
 
@@ -78,29 +81,56 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     ],
     [],
   )
-  const downloadTask = async () => {
+  const downloadTask = async (name) => {
+    if(!name) {
+      closeDialog()
+      return
+    }
     const taskId = [...selectedRowKeys]
     const payload = {
       tasks: taskId,
     }
-    const response = await downloadTaskMutation.mutateAsync({ data: payload })
-    const data = response.data
-    const path = data.payload?.path
+    if (selectedRowKeys.length > 0) {
+      const response = await downloadTaskMutation.mutateAsync({ data: payload })
+      const data = response.data
+      const path = data.payload?.path
 
-    if (response) {
-      const basePath = 'http://localhost:3000'
-      const filename = path
-      const downloadLink = document.createElement('a')
-      downloadLink.href = `${basePath}/${filename}`
-      downloadLink.download = filename
-      downloadLink.click()
+      if (response) {
+        const basePath = 'http://localhost:3000'
+        const filename = name
+        const res = await fetch(`${basePath}/${path}`)
+        const blob = await res.blob()
+
+        const downloadLink = document.createElement('a')
+        const url = window.URL.createObjectURL(blob)
+        downloadLink.href = url
+        downloadLink.download = filename
+        document.body.appendChild(downloadLink)
+        downloadLink.click()
+
+        // Cleanup
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(downloadLink)
+      }
+      closeDialog()
+    }else{
+      closeDialog()
     }
     console.log(path)
   }
+
   console.log(rowSelection)
 
   return (
     <>
+      {isDialogOpen && (
+        <InputNameTask
+          onClose={closeDialog}
+          onSubmit={(name) => {
+            downloadTask(name)
+          }}
+        />
+      )}
       <Flex vertical={true} gap={24}>
         <Flex gap={24}>
           <Input
@@ -156,8 +186,8 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       />
       <Flex justify='end' style={{ width: '100%' }}>
         <Button
-          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
-          onClick={downloadTask}
+          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+          onClick={openDialog}
         >
           Download Tugas
         </Button>

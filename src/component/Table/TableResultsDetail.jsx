@@ -171,9 +171,6 @@ const TableResultsDetail = () => {
     const rowsToSave = selectedRows.length > 0 ? selectedRows : data
     const buffer = await generateExcekFile(rowsToSave)
     const blob = new Blob([buffer], { type: 'application/octet-stream' })
-    saveAs(
-      new File([blob], `${name}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-    )
 
     const formTask = new FormData()
     formTask.append('name', name)
@@ -261,7 +258,7 @@ const TableResultsDetail = () => {
       {isDialogOpen && dialogContent}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
+          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
@@ -292,9 +289,9 @@ const TableResultsDetail = () => {
         />
       )}
       <Table rowSelection={{ ...rowSelection }} columns={columns} dataSource={data} pagination={true} />
-      <div className='flex w-full justify-end'>
+      <div className='flex justify-end w-full'>
         <Button
-          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
+          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
           onClick={() => openDialogContent(inputNameTask)}
         >
           {selectedRowKeys.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}
