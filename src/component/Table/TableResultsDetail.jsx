@@ -19,6 +19,7 @@ const TableResultsDetail = () => {
   const location = useLocation()
   const { result, previousState } = location.state || {}
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [selectedRows, setSelectedRows] = useState([])
   const [dialogContent, setDialogContent] = useState()
   const { savedFilters, setFilterCriteria } = useContext(FormContext)
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
@@ -28,8 +29,9 @@ const TableResultsDetail = () => {
 
   const processedTypeColumn = previousState.typeColumn
 
-  const onSelectChange = (newSelectedRowKeys) => {
+  const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
     setSelectedRowKeys(newSelectedRowKeys)
+    setSelectedRows(newSelectedRows)
   }
 
   const rowSelection = {
@@ -141,7 +143,7 @@ const TableResultsDetail = () => {
 
   const generateExcekFile = async (rowToSave) => {
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('My sheet')
+    const worksheet = workbook.addWorksheet('Sheet1')
     const compareColums = [
       ...previousState.tableColumns,
       {
@@ -166,11 +168,11 @@ const TableResultsDetail = () => {
   }
 
   const handleSaveTask = async (name) => {
-    const rowsToSave = selectedRowKeys.length > 0 ? selectedRowKeys : data
+    const rowsToSave = selectedRows.length > 0 ? selectedRows : data
     const buffer = await generateExcekFile(rowsToSave)
+    const blob = new Blob([buffer], { type: 'application/octet-stream' })
     saveAs(
-      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-      `${name}.xlsx`,
+      new File([blob], `${name}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
     )
 
     const formTask = new FormData()
@@ -189,8 +191,7 @@ const TableResultsDetail = () => {
     })
     formTask.append(
       'file',
-      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-      `${name}.xlsx`,
+      new File([blob], `${name}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
     )
 
     navigate('/tugas')
@@ -290,12 +291,7 @@ const TableResultsDetail = () => {
           ]}
         />
       )}
-      <Table
-        rowSelection={{ ...rowSelection }}
-        columns={columns}
-        dataSource={data}
-        pagination={true}
-      />
+      <Table rowSelection={{ ...rowSelection }} columns={columns} dataSource={data} pagination={true} />
       <div className='flex w-full justify-end'>
         <Button
           className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'

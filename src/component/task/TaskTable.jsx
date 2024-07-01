@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SearchOutlined } from '@ant-design/icons'
-import { DatePicker, Flex, Input, Select, Table } from 'antd'
+import { Button, DatePicker, Flex, Input, Select, Table } from 'antd'
 import Badge from '../shared/Badge'
 import { ExcelType, TaskStatus } from '../../libs/enum'
 import { dateFormatter, filterResponse } from '../../libs/utils'
+import useDownloadTask from '../../services/tasks/useDownloadTask'
 
 const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
   const navigate = useNavigate()
+
+  const downloadTaskMutation = useDownloadTask()
 
   const [filters, setFilters] = useState({
     name: { value: '', regex: true },
@@ -75,7 +78,26 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     ],
     [],
   )
-  console.log(rowSelection);
+  const downloadTask = async () => {
+    const taskId = [...selectedRowKeys]
+    const payload = {
+      tasks: taskId,
+    }
+    const response = await downloadTaskMutation.mutateAsync({ data: payload })
+    const data = response.data
+    const path = data.payload?.path
+
+    if (response) {
+      const basePath = 'http://localhost:3000'
+      const filename = path
+      const downloadLink = document.createElement('a')
+      downloadLink.href = `${basePath}/${filename}`
+      downloadLink.download = filename
+      downloadLink.click()
+    }
+    console.log(path)
+  }
+  console.log(rowSelection)
 
   return (
     <>
@@ -132,6 +154,14 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
         columns={columns}
         dataSource={filteredTasks}
       />
+      <Flex justify='end' style={{ width: '100%' }}>
+        <Button
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
+          onClick={downloadTask}
+        >
+          Download Tugas
+        </Button>
+      </Flex>
     </>
   )
 }
