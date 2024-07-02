@@ -82,7 +82,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     [],
   )
   const downloadTask = async (name) => {
-    if(!name) {
+    if (!name) {
       closeDialog()
       return
     }
@@ -94,6 +94,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       const response = await downloadTaskMutation.mutateAsync({ data: payload })
       const data = response.data
       const path = data.payload?.path
+      console.log(path)
 
       if (response) {
         const basePath = 'http://localhost:3000'
@@ -107,16 +108,13 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
         downloadLink.download = filename
         document.body.appendChild(downloadLink)
         downloadLink.click()
-
-        // Cleanup
-        window.URL.revokeObjectURL(url)
         document.body.removeChild(downloadLink)
+        window.URL.revokeObjectURL(url)
       }
       closeDialog()
-    }else{
+    } else {
       closeDialog()
     }
-    console.log(path)
   }
 
   console.log(rowSelection)
@@ -186,7 +184,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       />
       <Flex justify='end' style={{ width: '100%' }}>
         <Button
-          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
           onClick={openDialog}
         >
           Download Tugas
