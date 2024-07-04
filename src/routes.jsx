@@ -9,7 +9,6 @@ import { Outlet } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import Aside from './component/shared/Aside'
 import { Bounce, ToastContainer } from 'react-toastify'
-import ExcelRevisi from './pages/ExcelRevisi'
 
 const routes = [
   {
@@ -44,10 +43,6 @@ const routes = [
       {
         path: '/table/:filename',
         children: [{ index: true, element: <TableResultsDetail /> }],
-      },
-      {
-        path: '/revisi',
-        element: <ExcelRevisi />,
       },
       {
         path: '/tugas',

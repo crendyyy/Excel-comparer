@@ -64,7 +64,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       },
       {
         title: 'Tipe',
-        dataIndex: 'type',
+        dataIndex: ['excel', 'type'],
         sorter: (a, b) => a.type.localeCompare(b.type),
       },
       {
@@ -82,7 +82,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
     [],
   )
   const downloadTask = async (name) => {
-    if(!name) {
+    if (!name) {
       closeDialog()
       return
     }
@@ -113,13 +113,10 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
         document.body.removeChild(downloadLink)
       }
       closeDialog()
-    }else{
+    } else {
       closeDialog()
     }
-    console.log(path)
   }
-
-  console.log(rowSelection)
 
   return (
     <>
@@ -186,7 +183,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
       />
       <Flex justify='end' style={{ width: '100%' }}>
         <Button
-          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
           onClick={openDialog}
         >
           Download Tugas

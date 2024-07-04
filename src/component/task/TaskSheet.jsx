@@ -32,16 +32,19 @@ const TaskSheet = ({ task, columns, isLoading }) => {
         }
       }
 
-      const style =
-        column.key === task.targetColumn
-          ? record.isModified
-            ? { background: '#8be78d', color: '#006644' }
-            : { background: '#e5e7eb' }
-          : record.isDuplicated
-            ? { background: '#fed7aa', color: '#c2410c' }
-            : column.key === 'sebelumnya'
-              ? { background: '#fee7e7', color: '#ad1f1f' }
-              : {}
+      let style = {}
+
+      if (column.key === task.targetColumn) {
+        if (record.isModified) {
+          style = { background: '#8be78d', color: '#006644' }
+        } else {
+          style = { background: '#e5e7eb' }
+        }
+      } else if (column.key === 'sebelumnya') {
+        style = { background: '#fecaca', color: '#dc2626' }
+      } else if (record.isDuplicated) {
+        style = { background: '#fed7aa', color: '#c2410c' }
+      }
 
       return {
         props: { style },

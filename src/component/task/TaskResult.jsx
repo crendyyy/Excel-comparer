@@ -1,9 +1,10 @@
+import { useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Button, Collapse, Flex, Table } from 'antd'
 import Text from 'antd/es/typography/Text'
 import Title from 'antd/es/typography/Title'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, ArrowRightOutlined, CloseOutlined } from '@ant-design/icons'
 import TaskSheet from './TaskSheet'
 import useUpdateTask from '../../services/tasks/useUpdateTask'
 import { columnSorter } from '../../libs/utils'
@@ -12,7 +13,18 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
   const navigate = useNavigate()
   const updateTaskMutation = useUpdateTask()
 
+  // State
+  const [filter, setFilter] = useState('NONE')
   const hasDuplicate = task.duplicated.length > 0
+
+  // Event handler
+  const handleFilterChange = (value) => {
+    if (value === filter) {
+      setFilter('NONE')
+    } else {
+      setFilter(value)
+    }
+  }
 
   const handleUpdateStatus = async (status) => {
     await updateTaskMutation.mutateAsync(
@@ -25,6 +37,21 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
       },
     )
   }
+
+  // Data
+  const filteredRows = useMemo(() => {
+    return task.rows.filter((row) => {
+      if (filter === 'MODIFIED' && row.isModified) {
+        return true
+      } else if (filter === 'NOT_MODIFIED' && !row.isModified) {
+        return true
+      } else if (filter === 'DUPLICATED' && row.isDuplicated) {
+        return true
+      } else if (filter === 'NONE') {
+        return true
+      }
+    })
+  }, [task, filter])
 
   return (
     <Flex vertical={true} gap={40}>
@@ -95,17 +122,40 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
           </Flex>
 
           <ul className='flex gap-4'>
-            <li className='flex items-center gap-2'>
-              <span className='h-2 w-2 rounded-full bg-[#f97316]'></span>Duplikasi
+            <li className='flex items-center gap-2 rounded-lg bg-red-200 px-4 py-1 text-red-600'>
+              <span className='h-2 w-2 rounded-full bg-red-600'></span>Nilai sebelumnya
             </li>
-            <li className='flex items-center gap-2'>
-              <span className='h-2 w-2 rounded-full bg-[#b51f3f]'></span>Nilai sebelumnya
+
+            <li
+              onClick={() => handleFilterChange('DUPLICATED')}
+              className='flex cursor-pointer items-center gap-2 rounded-lg bg-orange-200 px-4 py-1 text-orange-600'
+            >
+              {filter === 'DUPLICATED' ? (
+                <CloseOutlined />
+              ) : (
+                <span className='h-2 w-2 rounded-full bg-orange-600'></span>
+              )}
+              Duplikasi
             </li>
-            <li className='flex items-center gap-2'>
-              <span className='h-2 w-2 rounded-full bg-[#8be78d]'></span>Sudah berubah
+
+            <li
+              onClick={() => handleFilterChange('MODIFIED')}
+              className='flex cursor-pointer items-center gap-2 rounded-lg bg-green-200 px-4 py-1 text-green-600'
+            >
+              {filter === 'MODIFIED' ? <CloseOutlined /> : <span className='h-2 w-2 rounded-full bg-green-600'></span>}
+              Sudah berubah
             </li>
-            <li className='flex items-center gap-2'>
-              <span className='h-2 w-2 rounded-full bg-[#a2a8ad]'></span>Belum berubah
+
+            <li
+              onClick={() => handleFilterChange('NOT_MODIFIED')}
+              className='flex cursor-pointer items-center gap-2 rounded-lg bg-gray-200 px-4 py-1 text-gray-600'
+            >
+              {filter === 'NOT_MODIFIED' ? (
+                <CloseOutlined />
+              ) : (
+                <span className='h-2 w-2 rounded-full bg-gray-600'></span>
+              )}
+              Belum berubah
             </li>
           </ul>
         </Flex>
@@ -113,11 +163,11 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
         <TaskSheet
           isLoading={isLoading}
           columns={[
-            ...task.excel.columns.slice(0, -2),
+            ...task.excel.columns,
             { label: 'Sebelumnya', key: 'sebelumnya' },
             { label: 'Persentase', key: 'persentase' },
           ]}
-          task={task}
+          task={{ ...task, rows: filteredRows }}
         />
 
         <Flex gap={16}>
