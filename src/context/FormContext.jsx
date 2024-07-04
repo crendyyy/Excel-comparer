@@ -33,6 +33,7 @@ export const FormProvider = ({ children }) => {
   const [savedInputsSecondary, setSavedInputsSecondary] = useState([])
   const [savedResultsSecondary, setSavedResultsSecondary] = useState([])
   const [originalResults, setOriginalResults] = useState([])
+  const [filterColumns, setFilterColumns] = useState([])
   const [isSubmited, setIsSubmited] = useState(false)
   const [hideOperator, setHideOperator] = useState(false)
 
@@ -93,6 +94,8 @@ export const FormProvider = ({ children }) => {
         setMainFileCustom,
         secondaryFileCustom, 
         setSecondaryFileCustom,
+        filterColumns,
+        setFilterColumns
       }}
     >
       {children}

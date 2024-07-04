@@ -12,6 +12,7 @@ import Title from 'antd/es/typography/Title'
 import { xlsxMimeType } from '../libs/const'
 import InputMainFileDialog from '../component/dialog/InputMainFile'
 import InputSecondaryFileDialog from '../component/dialog/InputSecondaryFiles'
+import { useGetExcel } from '../services/excels/useGetExcel'
 
 const TableDetail = () => {
   const {
@@ -56,17 +57,31 @@ const TableDetail = () => {
     setMainFileCustom,
     setFormInputMain,
     setFormInputSecondary,
+    filterColumns,
+    setFilterColumns
   } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
   const secondaryFilesRef = useRef(null)
 
+  const { data: excels } = useGetExcel()
+  console.log(excels?.payload);
+  console.log(typeTable);
+
   const submitExcelMutation = useCompareExcel()
-  const submitMissingMutation = useCompareSKUExcel()
 
   const [dialogContent, setDialogContent] = useState(null)
   const prevTypeTableRef = useRef(typeTable)
+
+  useEffect(() => {
+    if (typeTable && excels?.payload) {
+      const selectedTable = excels.payload.find(table => table.type ===typeTable)
+      if (selectedTable) {
+        setFilterColumns(selectedTable.filterableColumns)
+      }
+    }
+  }, [typeTable, excels?.payload])
 
   useEffect(() => {
     if (originalResults.length > 0) {
@@ -217,12 +232,10 @@ const TableDetail = () => {
       data.append('targetColumn', formData.targetColumn)
     }
 
-    const mutation = typeColumn === 'sku_produk' ? submitMissingMutation : submitExcelMutation
-
     const response =
       typeTable === 'shopee_product'
-        ? await mutation.mutateAsync({ data: JSON.stringify(data) })
-        : await mutation.mutateAsync({ data })
+        ? await submitExcelMutation.mutateAsync({ data: JSON.stringify(data) })
+        : await submitExcelMutation.mutateAsync({ data })
 
     const result = response.data
     if (!result || !result.payload) {
@@ -303,10 +316,10 @@ const TableDetail = () => {
               placeholder='Pilih E-comm'
               value={typeTable}
               onChange={(value) => setTypeTable(value)}
-              options={Object.values(ExcelType).map((col) => ({
-                label: col.label,
-                value: col.value,
-              }))}
+              options={excels?.payload.map((col) => ({
+                label: col.name,
+                value: col.type,
+              })) || []}
             />
           </div>
           {typeTable && (
@@ -319,9 +332,9 @@ const TableDetail = () => {
                 placeholder='Pilih Column'
                 value={typeColumn}
                 onChange={(value) => setTypeColumn(value)}
-                options={Object.values(columns).map((col) => ({
+                options={filterColumns.map((col) => ({
                   label: col.label,
-                  value: col.value,
+                  value: col.key,
                 }))}
               />
             </div>

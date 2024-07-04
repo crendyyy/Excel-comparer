@@ -310,10 +310,10 @@ const InputSecondaryFileDialog = ({ onClose }) => {
                   </button>
                   {editIndex === null && (
                     <button
-                      className='flex items-center justify-center w-12 h-full border border-gray-300 border-solid rounded-lg'
+                      className='flex items-center justify-center w-12 h-full text-red-600 border border-gray-300 border-solid rounded-lg'
                       onClick={() => handleDeleteInput(index)}
                     >
-                      <TrashIcon className='w-5 h-5 text-red-500' />
+                      <TrashIcon />
                     </button>
                   )}
                 </div>
