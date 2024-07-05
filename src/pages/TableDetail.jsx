@@ -5,14 +5,14 @@ import FilterDialog from '../component/dialog/FilterDialog'
 import TableResult from '../component/Table/TableResults'
 import { Select } from 'antd'
 import { FormContext } from '../context/FormContext'
-import { columns, operators, ExcelType } from '../libs/enum'
+import { operators } from '../libs/enum'
 import { useCompareExcel } from '../services/excels/useCompareExcel'
-import { useCompareSKUExcel } from '../services/excels/useGetMissingSku'
 import Title from 'antd/es/typography/Title'
 import { xlsxMimeType } from '../libs/const'
 import InputMainFileDialog from '../component/dialog/InputMainFile'
 import InputSecondaryFileDialog from '../component/dialog/InputSecondaryFiles'
 import { useGetExcel } from '../services/excels/useGetExcel'
+import { toast } from 'react-toastify'
 
 const TableDetail = () => {
   const {
@@ -58,16 +58,14 @@ const TableDetail = () => {
     setFormInputMain,
     setFormInputSecondary,
     filterColumns,
-    setFilterColumns
+    setFilterColumns,
   } = useContext(FormContext)
 
   const { isDialogOpen, openDialog, closeDialog } = useDialog()
   const mainFileRef = useRef(null)
   const secondaryFilesRef = useRef(null)
 
-  const { data: excels } = useGetExcel()
-  console.log(excels?.payload);
-  console.log(typeTable);
+  const { data: excels, isPending, isError } = useGetExcel()
 
   const submitExcelMutation = useCompareExcel()
 
@@ -75,8 +73,14 @@ const TableDetail = () => {
   const prevTypeTableRef = useRef(typeTable)
 
   useEffect(() => {
+    if (isError) {
+      toast.error('Gagal, silahkan coba lagi', { autoClose: false })
+    }
+  }, [isError])
+
+  useEffect(() => {
     if (typeTable && excels?.payload) {
-      const selectedTable = excels.payload.find(table => table.type ===typeTable)
+      const selectedTable = excels.payload.find((table) => table.type === typeTable)
       if (selectedTable) {
         setFilterColumns(selectedTable.filterableColumns)
       }
@@ -313,13 +317,16 @@ const TableDetail = () => {
               size='large'
               showSearch
               style={{ width: '100%', height: '100%' }}
-              placeholder='Pilih E-comm'
+              loading={isPending ? true : false}
+              placeholder={'Pilih E-comm'}
               value={typeTable}
               onChange={(value) => setTypeTable(value)}
-              options={excels?.payload.map((col) => ({
-                label: col.name,
-                value: col.type,
-              })) || []}
+              options={
+                excels?.payload.map((col) => ({
+                  label: col.name,
+                  value: col.type,
+                })) || []
+              }
             />
           </div>
           {typeTable && (
