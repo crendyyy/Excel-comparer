@@ -22,7 +22,21 @@ const TaskDetail = () => {
 
   const [showResult, setShowResult] = useState(false)
   const [uploadedFile, setUploadedFile] = useState()
+  
+  const taskColumn = [
+    ...task?.payload.excel.columns || [],
+    {
+      label: 'Selisih',
+      key: 'selisih',
+    },
+    {
+      label: 'Persentase',
+      key: 'persentase',
+    },
+  ]
 
+  const skuTaskColumn = task?.payload.targetColumn === 'sku_produk' ? task?.payload.excel.columns : taskColumn
+  
   const handleBeforeUpload = (file) => {
     const isValidFileType = file.type === xlsxMimeType
     const successMessage = `${file.name} uploaded successfully.`
@@ -36,6 +50,7 @@ const TaskDetail = () => {
 
     return isValidFileType
   }
+
 
   const handleFileChange = (fileInfo) => {
     const { file } = fileInfo
@@ -88,7 +103,7 @@ const TaskDetail = () => {
         </Flex>
 
         {!showResult && (
-          <TaskSheet task={task?.payload || {}} columns={task?.payload.excel.columns || []} isLoading={isPending} />
+          <TaskSheet task={task?.payload || {}} columns={skuTaskColumn} isLoading={isPending} />
         )}
       </Flex>
     </Flex>
