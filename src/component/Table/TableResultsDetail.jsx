@@ -81,6 +81,10 @@ const TableResultsDetail = () => {
   const generateColumns = (tableColumns) => {
     const compareColums = [
       ...tableColumns,
+      // {
+      //   label: 'Sebelumnya',
+      //   key: 'sebelumnya',
+      // },
       {
         label: 'Selisih',
         key: 'selisih',
@@ -134,7 +138,7 @@ const TableResultsDetail = () => {
   }
 
   const columns = generateColumns(previousState.tableColumns)
-
+  // console.log(previousState.tableColumns)
   const data =
     result?.rows.map((row, index) => ({
       key: index,
@@ -155,13 +159,23 @@ const TableResultsDetail = () => {
         key: 'persentase',
       },
     ]
+
     const missingSkuColumns = processedTypeColumn === 'sku_produk' ? previousState.tableColumns : compareColums
-
-    const columns = missingSkuColumns.map((col) => ({ header: col.label, key: col.key, width: 30 }))
-    worksheet.columns = columns
-
-    rowToSave.forEach((row) => {
-      worksheet.addRow(row)
+    const columns = missingSkuColumns.map((col) => ({ name: col.label, filterButton: true }))
+    worksheet.addTable({
+      name: 'Table1',
+      ref: 'A1',
+      headerRow: true,
+      style: {
+        theme: 'TableStyleLight8',
+        showRowStripes: true,
+      },
+      columns: columns,
+      rows: rowToSave.map((row) => {
+        delete row.key
+        delete row.sebelumnya
+        return Object.values(row)
+      }),
     })
     const buffer = await workbook.xlsx.writeBuffer()
     return buffer
@@ -258,7 +272,7 @@ const TableResultsDetail = () => {
       {isDialogOpen && dialogContent}
       <div className='flex items-center justify-between'>
         <div className='flex gap-6'>
-          <Link to='/' className='flex items-center justify-center px-3 py-3 bg-white rounded-lg'>
+          <Link to='/' className='flex items-center justify-center rounded-lg bg-white px-3 py-3'>
             <ArrowLeft />
           </Link>
           <h1 className='font-bold'>{filename}</h1>
@@ -289,9 +303,9 @@ const TableResultsDetail = () => {
         />
       )}
       <Table rowSelection={{ ...rowSelection }} columns={columns} dataSource={data} pagination={true} />
-      <div className='flex justify-end w-full'>
+      <div className='flex w-full justify-end'>
         <Button
-          className='h-12 px-4 text-sm font-bold text-white w-fit rounded-primary bg-blue-950'
+          className='h-12 w-fit rounded-primary bg-blue-950 px-4 text-sm font-bold text-white'
           onClick={() => openDialogContent(inputNameTask)}
         >
           {selectedRowKeys.length > 0 ? 'Simpan Tugas' : 'Simpan Semua Tugas'}

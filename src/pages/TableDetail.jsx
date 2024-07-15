@@ -217,6 +217,8 @@ const TableDetail = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (submitExcelMutation.isPending) return
+
     let data
 
     if (typeTable === 'shopee_product') {
