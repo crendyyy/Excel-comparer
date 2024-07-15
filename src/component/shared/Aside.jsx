@@ -8,7 +8,7 @@ const Sidebar = () => {
     <>
       <div className='p-8'>
         <Title level={3} style={{ color: 'white' }}>
-          Logo
+          Excel Comparer
         </Title>
       </div>
 

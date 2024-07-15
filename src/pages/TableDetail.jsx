@@ -308,8 +308,8 @@ const TableDetail = () => {
 
   return (
     <div className='flex flex-col gap-8 p-10'>
-      <Title level={2}>Daftar Tugas</Title>
-      <form onSubmit={handleSubmit} className='flex justify-between w-full p-6 bg-white rounded-lg'>
+      <Title level={2}>Daftar Excel</Title>
+      <form onSubmit={handleSubmit} className='flex w-full justify-between rounded-lg bg-white p-6'>
         <div className='flex gap-6'>
           <div className='w-fit'>
             <Select
@@ -352,7 +352,7 @@ const TableDetail = () => {
                 <button
                   type='button'
                   onClick={() => openDialogWithContent(inputMainFileDialog)}
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {savedInputsMain.length === 0 ? 'File Utama' : `1 Toko Utama`}
                 </button>
@@ -360,7 +360,7 @@ const TableDetail = () => {
                 <>
                   <label
                     htmlFor='main-file'
-                    className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                    className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                   >
                     {mainFileName}
                   </label>
@@ -380,7 +380,7 @@ const TableDetail = () => {
                 <button
                   type='button'
                   onClick={() => openDialogWithContent(inputSecondaryFileDialog)}
-                  className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                  className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                 >
                   {savedInputsSecondary.length === 0 ? 'File Turunan' : `${savedInputsSecondary.length} Toko Cabang`}
                 </button>
@@ -388,7 +388,7 @@ const TableDetail = () => {
                 <>
                   <label
                     htmlFor='compares-file'
-                    className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+                    className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
                   >
                     {secondaryFileNames}
                   </label>
