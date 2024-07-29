@@ -3,17 +3,11 @@ import PropTypes from 'prop-types'
 import { Button, Collapse, Flex, Table } from 'antd'
 import Text from 'antd/es/typography/Text'
 import Title from 'antd/es/typography/Title'
-import { useNavigate } from 'react-router-dom'
 import { ArrowLeftOutlined, ArrowRightOutlined, CloseOutlined } from '@ant-design/icons'
 import TaskSheet from './TaskSheet'
-import useUpdateTask from '../../services/tasks/useUpdateTask'
 import { columnSorter } from '../../libs/utils'
 
 const TaskResult = ({ task, filename, isLoading, onHide }) => {
-  const navigate = useNavigate()
-  const updateTaskMutation = useUpdateTask()
-
-  // State
   const [filter, setFilter] = useState('NONE')
   const hasDuplicate = task.duplicated.length > 0
 
@@ -24,18 +18,6 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
     } else {
       setFilter(value)
     }
-  }
-
-  const handleUpdateStatus = async (status) => {
-    await updateTaskMutation.mutateAsync(
-      {
-        id: task.id,
-        data: { status },
-      },
-      {
-        onSuccess: () => navigate('/tugas'),
-      },
-    )
   }
 
   // Data
@@ -169,25 +151,6 @@ const TaskResult = ({ task, filename, isLoading, onHide }) => {
           ]}
           task={{ ...task, rows: filteredRows }}
         />
-
-        <Flex gap={16}>
-          <Button
-            style={{ height: 40, background: '#17c964' }}
-            type='primary'
-            size='middle'
-            onClick={() => handleUpdateStatus('done')}
-          >
-            Selesai
-          </Button>
-          <Button
-            style={{ height: 40, background: '#f31260' }}
-            type='primary'
-            size='middle'
-            onClick={() => handleUpdateStatus('revision')}
-          >
-            Revisi
-          </Button>
-        </Flex>
       </Flex>
     </Flex>
   )

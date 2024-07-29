@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Title from 'antd/es/typography/Title'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, Flex, message, Upload } from 'antd'
@@ -9,10 +9,14 @@ import TaskResult from '../component/task/TaskResult'
 
 import { xlsxMimeType } from '../libs/const'
 
-import useSubmitTask from '../services/tasks/useSubmitTask'
 import { useGetOneTask } from '../services/tasks/useGetTask'
+import useSubmitTask from '../services/tasks/useSubmitTask'
+import useUpdateTask from '../services/tasks/useUpdateTask'
 
 const TaskDetail = () => {
+  const navigate = useNavigate()
+  const updateTaskMutation = useUpdateTask()
+
   const { taskId } = useParams()
 
   const { data: task, isPending } = useGetOneTask(taskId)
@@ -22,9 +26,9 @@ const TaskDetail = () => {
 
   const [showResult, setShowResult] = useState(false)
   const [uploadedFile, setUploadedFile] = useState()
-  
+
   const taskColumn = [
-    ...task?.payload.excel.columns || [],
+    ...(task?.payload.excel.columns || []),
     {
       label: 'Selisih',
       key: 'selisih',
@@ -36,7 +40,19 @@ const TaskDetail = () => {
   ]
 
   const skuTaskColumn = task?.payload.targetColumn === 'sku_produk' ? task?.payload.excel.columns : taskColumn
-  
+
+  const handleUpdateStatus = async (status) => {
+    await updateTaskMutation.mutateAsync(
+      {
+        id: taskId,
+        data: { status },
+      },
+      {
+        onSuccess: () => navigate('/tugas'),
+      },
+    )
+  }
+
   const handleBeforeUpload = (file) => {
     const isValidFileType = file.type === xlsxMimeType
     const successMessage = `${file.name} uploaded successfully.`
@@ -50,7 +66,6 @@ const TaskDetail = () => {
 
     return isValidFileType
   }
-
 
   const handleFileChange = (fileInfo) => {
     const { file } = fileInfo
@@ -102,9 +117,26 @@ const TaskDetail = () => {
           </Flex>
         </Flex>
 
-        {!showResult && (
-          <TaskSheet task={task?.payload || {}} columns={skuTaskColumn} isLoading={isPending} />
-        )}
+        {!showResult && <TaskSheet task={task?.payload || {}} columns={skuTaskColumn} isLoading={isPending} />}
+      </Flex>
+
+      <Flex gap={16}>
+        <Button
+          style={{ height: 40, background: '#17c964' }}
+          type='primary'
+          size='middle'
+          onClick={() => handleUpdateStatus('done')}
+        >
+          Selesai
+        </Button>
+        <Button
+          style={{ height: 40, background: '#f31260' }}
+          type='primary'
+          size='middle'
+          onClick={() => handleUpdateStatus('revision')}
+        >
+          Revisi
+        </Button>
       </Flex>
     </Flex>
   )

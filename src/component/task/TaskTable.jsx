@@ -172,7 +172,7 @@ const TaskTable = ({ tasks, isLoading, selectedDate, onDateChange }) => {
 
       <Table
         rowSelection={rowSelection}
-        pagination={true}
+        pagination={false}
         onRow={(record) => ({
           onClick: () => navigate(`/tugas/${record.key}`),
         })}
