@@ -81,10 +81,10 @@ const TableResultsDetail = () => {
   const generateColumns = (tableColumns) => {
     const compareColums = [
       ...tableColumns,
-      // {
-      //   label: 'Sebelumnya',
-      //   key: 'sebelumnya',
-      // },
+      {
+        label: 'Nilai(Induk)',
+        key: 'sebelumnya',
+      },
       {
         label: 'Selisih',
         key: 'selisih',
@@ -138,7 +138,6 @@ const TableResultsDetail = () => {
   }
 
   const columns = generateColumns(previousState.tableColumns)
-  // console.log(previousState.tableColumns)
   const data =
     result?.rows.map((row, index) => ({
       key: index,

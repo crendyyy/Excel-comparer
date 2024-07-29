@@ -17,7 +17,6 @@ export const FormProvider = ({ children }) => {
   const [mainFileName, setMainFileName] = useState('File Utama')
   const [mainFilePrice, setMainFilePrice] = useState('Harga Mati')
   const [mainFileDiscount, setMainFileDiscount] = useState('Harga Coret')
-  const [mainFileCustom, setMainFileCustom] = useState('Harga Khusus')
   const [secondaryFilePrice, setSecondaryFilePrice] = useState('Harga Mati')
   const [secondaryFileDiscount, setSecondaryFileDiscount] = useState('Harga Coret')
   const [secondaryFileCustom, setSecondaryFileCustom] = useState('Harga Khusus')
@@ -90,12 +89,10 @@ export const FormProvider = ({ children }) => {
         setSavedResultsSecondary,
         originalResults,
         setOriginalResults,
-        mainFileCustom, 
-        setMainFileCustom,
-        secondaryFileCustom, 
+        secondaryFileCustom,
         setSecondaryFileCustom,
         filterColumns,
-        setFilterColumns
+        setFilterColumns,
       }}
     >
       {children}

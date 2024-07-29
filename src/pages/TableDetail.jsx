@@ -54,7 +54,6 @@ const TableDetail = () => {
     setOriginalResults,
     setMainFilePrice,
     setMainFileDiscount,
-    setMainFileCustom,
     setFormInputMain,
     setFormInputSecondary,
     filterColumns,
@@ -119,7 +118,6 @@ const TableDetail = () => {
       setSecondaryFileNames('File Turunan')
       setMainFilePrice('Harga Mati')
       setMainFileDiscount('Harga Coret')
-      setMainFileCustom('Harga Khusus')
     }
   }, [typeTable, savedInputsMain, setFormData, typeColumn])
 

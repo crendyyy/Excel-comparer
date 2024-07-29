@@ -13,21 +13,16 @@ const InputMainFileDialog = ({ onClose }) => {
     mainFileDiscount,
     setMainFileDiscount,
     mainFileCustom,
-    setMainFileCustom,
-    savedInputsMain,
     setSavedInputsMain,
   } = useContext(FormContext)
 
   const [tempMainFileName, setTempMainFileName] = useState(mainFilePrice)
   const [tempMainFileDiscount, setTempMainFileDiscount] = useState(mainFileDiscount)
-  const [tempMainFileCustom, setTempMainFileCustom] = useState(mainFileCustom)
   const [tempMainFilePrice, setTempMainFilePrice] = useState(null)
   const [tempMainFileDiscountFile, setTempMainFileDiscountFile] = useState(null)
-  const [tempMainFileCustomFile, setTempMainFileCustomFile] = useState(null)
 
   const mainFilePriceRef = useRef(null)
   const mainFileDiscountRef = useRef(null)
-  const mainFileCustomRef = useRef(null)
 
   const submitCombinedFiles = useFindActualPrice()
 
@@ -44,10 +39,6 @@ const InputMainFileDialog = ({ onClose }) => {
       setTempMainFileDiscountFile(files[0])
       const truncatedName = truncateFileName(files[0].name)
       setTempMainFileDiscount(truncatedName)
-    } else if (name === 'main-file-custom') {
-      setTempMainFileCustomFile(files[0])
-      const truncatedName = truncateFileName(files[0].name)
-      setTempMainFileCustom(truncatedName)
     }
   }
 
@@ -55,7 +46,7 @@ const InputMainFileDialog = ({ onClose }) => {
     e.preventDefault()
 
     if (!tempMainFilePrice || !tempMainFileDiscountFile) {
-      if(!formInputMain.mainFile || !formInputMain.discountFile){
+      if (!formInputMain.mainFile || !formInputMain.discountFile) {
         onClose()
         return
       }
@@ -65,16 +56,13 @@ const InputMainFileDialog = ({ onClose }) => {
       const formInputMainData = new FormData()
       formInputMainData.append('mainFile', tempMainFilePrice || formInputMain.mainFile)
       formInputMainData.append('discountFile', tempMainFileDiscountFile || formInputMain.discountFile)
-      formInputMainData.append('customFile', tempMainFileCustomFile || formInputMain.customFile)
 
       setFormInputMain({
         mainFile: tempMainFilePrice || formInputMain.mainFile,
         discountFile: tempMainFileDiscountFile || formInputMain.discountFile,
-        customFile: tempMainFileCustomFile || formInputMain.customFile,
       })
       setMainFilePrice(tempMainFileName)
       setMainFileDiscount(tempMainFileDiscount)
-      setMainFileCustom(tempMainFileCustom)
 
       const response = await submitCombinedFiles.mutateAsync({ data: formInputMainData })
 
@@ -88,28 +76,26 @@ const InputMainFileDialog = ({ onClose }) => {
     }
     onClose()
   }
-  
+
   const handleCancel = () => {
     if (!mainFilePrice && !mainFileDiscount && !mainFileCustom) {
       setTempMainFileName('Harga Mati')
       setTempMainFileDiscount('Harga Coret')
-      setTempMainFileCustom('Harga Khusus')
       setTempMainFilePrice(null)
       setTempMainFileDiscountFile(null)
-      setTempMainFileCustomFile(null)
     }
     onClose()
   }
 
   return (
     <Dialog onCancel={handleCancel}>
-      <div className='flex flex-col gap-10 p-6 bg-white border border-gray-100 border-solid w-96 rounded-primary'>
+      <div className='flex w-96 flex-col gap-10 rounded-primary border border-solid border-gray-100 bg-white p-6'>
         <div className='flex flex-col gap-4'>
           <span className='text-base font-bold'>File Utama</span>
           <div className='flex flex-col gap-4'>
             <label
               htmlFor='main-file-price'
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
             >
               {tempMainFileName}
             </label>
@@ -125,7 +111,7 @@ const InputMainFileDialog = ({ onClose }) => {
             />
             <label
               htmlFor='main-file-discount'
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
+              className='flex gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-base font-semibold text-gray-600'
             >
               {tempMainFileDiscount}
             </label>
@@ -139,34 +125,18 @@ const InputMainFileDialog = ({ onClose }) => {
               required
               ref={mainFileDiscountRef}
             />
-            <label
-              htmlFor='main-file-custom'
-              className='flex gap-2 px-4 py-3 text-base font-semibold text-gray-600 border-2 border-gray-300 border-dashed rounded-lg'
-            >
-              {tempMainFileCustom}
-            </label>
-            <input
-              name='main-file-custom'
-              type='file'
-              id='main-file-custom'
-              accept={xlsxMimeType}
-              className='hidden'
-              onChange={handleFileChange}
-              required
-              ref={mainFileCustomRef}
-            />
           </div>
         </div>
         <div className='flex h-12 gap-6'>
           <button
             onClick={handleCancel}
-            className='flex items-center justify-center w-full h-full text-base font-bold border border-solid rounded-lg border-blue-950 text-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg border border-solid border-blue-950 text-base font-bold text-blue-950'
           >
             Batalkan
           </button>
           <button
             onClick={handleConfirm}
-            className='flex items-center justify-center w-full h-full text-base font-bold text-white rounded-lg bg-blue-950'
+            className='flex h-full w-full items-center justify-center rounded-lg bg-blue-950 text-base font-bold text-white'
           >
             Konfirmasi
           </button>
